@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
-import { apiError, NotFoundError, ServerError } from '@/lib/errors'
+import { supabaseAdmin as supabase } from '@/lib/supabase'
+import { apiError, NotFoundError } from '@/lib/errors'
 
 type Params = { params: { id: string } }
 
