@@ -1,6 +1,6 @@
-import type { Restaurant } from '../../../types/Restaurant'
-import { restaurants as initialRestaurants } from '../../data'
-import { NotFoundError, BadRequestError } from '../../utils/Exception'
+import type { Restaurant } from '../../../types/Restaurant.ts'
+import { restaurants as initialRestaurants } from '../../data.ts'
+import { NotFoundError, BadRequestError } from '../../utils/Exception.ts'
 
 export class RestaurantService {
   /**

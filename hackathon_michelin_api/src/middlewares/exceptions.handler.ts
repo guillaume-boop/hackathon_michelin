@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from 'express'
-import type { ApiException } from '../types/Exception.ts'
+import type { ApiException } from '../../types/Exception.ts'
 import { ServerError } from '../utils/Exception.ts'
 
 /**
