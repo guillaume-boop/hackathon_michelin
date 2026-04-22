@@ -1,169 +1,139 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import BottomNav from '@/components/layout/BottomNav'
 import AuthGateModal from '@/components/ui/AuthGateModal'
-import Stars from '@/components/ui/Stars'
 
-type Chef = {
+type Ami = {
+  followee_id: string
+  users: { id: string; username: string; avatar_url: string | null } | null
+}
+
+type Restaurant = {
   id: string
-  bio: string | null
-  video_url: string | null
-  users: { id: string; username: string; avatar_url: string | null }
-  restaurants: { id: string; name: string; city: string; michelin_stars: number; green_stars: boolean }
+  name: string
+  city: string
+  country: string
+  michelin_stars: number
+  green_stars: boolean
 }
 
-type FriendLocation = {
-  user_id: string
-  lat: number
-  lng: number
-  updated_at: string
-  users?: { username: string; avatar_url: string | null }
-  restaurant?: { name: string; city: string }
+type User = {
+  id: string
+  username: string
+  avatar_url: string | null
+  role: string
 }
 
-const CITY_PINS = [
-  { city: 'Paris', country: 'FR', x: 48, y: 32 },
-  { city: 'Tokyo', country: 'JP', x: 80, y: 38 },
-  { city: 'New York', country: 'US', x: 22, y: 37 },
-  { city: 'London', country: 'GB', x: 46, y: 29 },
-  { city: 'Copenhague', country: 'DK', x: 50, y: 26 },
-  { city: 'Barcelona', country: 'ES', x: 47, y: 36 },
-  { city: 'Menton', country: 'FR', x: 49, y: 36 },
-]
 
 export default function AmisPage() {
   const { data: session } = useSession()
-  const [tab, setTab] = useState<'discover' | 'map'>('discover')
-  const [chefs, setChefs] = useState<Chef[]>([])
-  const [friendLocations, setFriendLocations] = useState<FriendLocation[]>([])
-  const [loading, setLoading] = useState(true)
-  const [following, setFollowing] = useState<Set<string>>(new Set())
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
+  const [tab, setTab] = useState<'amis' | 'decouvrir'>(
+    (searchParams.get('tab') as 'amis' | 'decouvrir') ?? 'amis'
+  )
   const [showAuthGate, setShowAuthGate] = useState(false)
 
+  // Amis state
+  const [amis, setAmis] = useState<Ami[]>([])
+  const [loadingAmis, setLoadingAmis] = useState(false)
+
+  // Découvrir / search state
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [query, setQuery] = useState(searchParams.get('q') ?? '')
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([])
+  const [users, setUsers] = useState<User[]>([])
+  const [loadingSearch, setLoadingSearch] = useState(false)
+
+  // Fetch amis (following) when session ready
   useEffect(() => {
-    fetch('/api/chefs')
+    if (!session?.user?.id) return
+    setLoadingAmis(true)
+    fetch(`/api/users/${session.user.id}/following`)
       .then(r => r.json())
-      .then(d => setChefs(Array.isArray(d) ? d : []))
-      .finally(() => setLoading(false))
+      .then(d => {
+        const list = Array.isArray(d) ? d : []
+        // Supabase returns users as array on joins — normalize
+        setAmis(list.map((item: { followee_id: string; users: Ami['users'] | Ami['users'][] }) => ({
+          followee_id: item.followee_id,
+          users: Array.isArray(item.users) ? (item.users[0] ?? null) : item.users,
+        })))
+      })
+      .finally(() => setLoadingAmis(false))
+  }, [session?.user?.id])
 
-    if (session) {
-      fetch('/api/map/friends')
-        .then(r => r.json())
-        .then(d => setFriendLocations(Array.isArray(d) ? d : []))
+
+  // Sync tab + query to URL (replace, pas push — pas de nouvelle entrée historique)
+  useEffect(() => {
+    const params = new URLSearchParams()
+    if (tab !== 'amis') params.set('tab', tab)
+    if (query) params.set('q', query)
+    const qs = params.toString()
+    router.replace(qs ? `/amis?${qs}` : '/amis', { scroll: false })
+  }, [tab, query, router])
+
+  // Focus input when switching to découvrir
+  useEffect(() => {
+    if (tab === 'decouvrir') setTimeout(() => inputRef.current?.focus(), 150)
+  }, [tab])
+
+  const search = useCallback(async (q: string) => {
+    if (!q.trim()) { setRestaurants([]); setUsers([]); return }
+    setLoadingSearch(true)
+    try {
+      const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`)
+      const data = await res.json()
+      setRestaurants(data.restaurants ?? [])
+      setUsers(data.users ?? [])
+    } finally {
+      setLoadingSearch(false)
     }
-  }, [session])
+  }, [])
 
-  const handleFollow = async (userId: string) => {
-    if (!session) { setShowAuthGate(true); return }
-    const isFollowing = following.has(userId)
-    setFollowing(prev => {
-      const next = new Set(prev)
-      if (isFollowing) next.delete(userId)
-      else next.add(userId)
-      return next
-    })
-    await fetch(`/api/users/${userId}/follow`, {
-      method: isFollowing ? 'DELETE' : 'POST',
-    })
-  }
+  useEffect(() => {
+    const t = setTimeout(() => search(query), 250)
+    return () => clearTimeout(t)
+  }, [query, search])
+
+  const isSearching = query.trim().length > 0
+  const hasResults = restaurants.length > 0 || users.length > 0
 
   return (
-    <div className="flex flex-col bg-black min-h-dvh" style={{ paddingBottom: '80px' }}>
+    <div className="flex flex-col bg-black min-h-dvh pb-24">
 
-      {/* Header */}
-      <div className="pt-safe px-4 pt-4 pb-0">
-        <h1 className="text-2xl font-bold text-white mb-4">Communauté</h1>
-
-        {/* Tab switcher */}
+      {/* ── Header ───────────────────────────── */}
+      <div className="px-4 pt-14 pb-0">
+        <h1 className="text-2xl font-black text-white mb-4">Communauté</h1>
         <div className="flex gap-0 bg-white/5 rounded-2xl p-1 mb-5">
-          {(['discover', 'map'] as const).map(t => (
+          {([
+            { key: 'amis', label: '👥 Amis' },
+            { key: 'decouvrir', label: '🔍 Découvrir' },
+          ] as const).map(({ key, label }) => (
             <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${tab === t ? 'bg-white text-black' : 'text-white/50'}`}
+              key={key}
+              onClick={() => setTab(key)}
+              className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${tab === key ? 'bg-white text-black' : 'text-white/50'}`}
             >
-              {t === 'discover' ? '✦ Découvrir' : '🗺 Map amis'}
+              {label}
             </button>
           ))}
         </div>
       </div>
 
-      {tab === 'discover' ? (
-        <div className="px-4 flex flex-col gap-4">
-          {/* Suggested section */}
-          <p className="text-white/40 text-xs uppercase tracking-widest font-semibold">Chefs & Food lovers</p>
-
-          {loading ? (
-            Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="h-20 rounded-2xl bg-white/5 animate-pulse" />
-            ))
-          ) : chefs.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-white/40 text-sm">Lance le script de seed pour voir des profils.</p>
-            </div>
-          ) : (
-            chefs.map(chef => (
-              <div
-                key={chef.id}
-                className="flex items-center gap-4 bg-white/5 rounded-2xl p-4 border border-white/5"
-              >
-                {/* Avatar */}
-                <Link href={`/chef/${chef.id}`} className="shrink-0">
-                  <div className="w-14 h-14 rounded-full overflow-hidden bg-neutral-800">
-                    {chef.users?.avatar_url ? (
-                      <img src={chef.users.avatar_url} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-xl font-bold" style={{ background: '#E4002B' }}>
-                        {(chef.users?.username?.[0] ?? '?').toUpperCase()}
-                      </div>
-                    )}
-                  </div>
-                </Link>
-
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <Link href={`/chef/${chef.id}`}>
-                    <p className="text-white font-semibold text-sm truncate">@{chef.users?.username}</p>
-                    <div className="flex items-center gap-1.5 mt-0.5">
-                      <p className="text-white/50 text-xs truncate">{chef.restaurants?.name}</p>
-                      <Stars count={chef.restaurants?.michelin_stars ?? 0} green={chef.restaurants?.green_stars} />
-                    </div>
-                    {chef.bio && (
-                      <p className="text-white/40 text-xs mt-1 line-clamp-1">{chef.bio}</p>
-                    )}
-                  </Link>
-                </div>
-
-                {/* Follow button */}
-                <button
-                  onClick={() => handleFollow(chef.users?.id)}
-                  className={`shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition-all active:scale-95 ${
-                    following.has(chef.users?.id)
-                      ? 'bg-white/10 text-white/60 border border-white/20'
-                      : 'text-white'
-                  }`}
-                  style={following.has(chef.users?.id) ? {} : { background: '#E4002B' }}
-                >
-                  {following.has(chef.users?.id) ? 'Suivi' : 'Suivre'}
-                </button>
-              </div>
-            ))
-          )}
-        </div>
-      ) : (
-        <div className="px-4 flex flex-col gap-4">
+      {/* ── Tab: Amis ────────────────────────── */}
+      {tab === 'amis' && (
+        <div className="px-4 flex flex-col gap-3">
           {!session ? (
-            <div
-              className="rounded-3xl overflow-hidden border border-white/10 flex flex-col items-center justify-center gap-4 p-8 text-center"
-              style={{ height: '280px', background: 'linear-gradient(135deg, #1a0a0a, #0a0a1a)' }}
-            >
-              <span className="text-4xl">🗺️</span>
+            <div className="flex flex-col items-center justify-center gap-4 p-8 text-center mt-8">
+              <span className="text-4xl">👥</span>
               <div>
-                <p className="text-white font-semibold mb-1">Où mangent tes amis ?</p>
-                <p className="text-white/40 text-sm">Connecte-toi pour voir la map en temps réel.</p>
+                <p className="text-white font-semibold mb-1">Tes amis apparaissent ici</p>
+                <p className="text-white/40 text-sm">Connecte-toi pour voir les gens que tu suis.</p>
               </div>
               <button
                 onClick={() => setShowAuthGate(true)}
@@ -173,87 +143,145 @@ export default function AmisPage() {
                 Se connecter
               </button>
             </div>
-          ) : (
-            <>
-              {/* Stylized world map */}
-              <div
-                className="relative rounded-3xl overflow-hidden border border-white/10"
-                style={{ height: '280px', background: 'linear-gradient(135deg, #050d1f, #0a1a0a)' }}
+          ) : loadingAmis ? (
+            Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-16 rounded-2xl bg-white/5 animate-pulse" />
+            ))
+          ) : amis.length === 0 ? (
+            <div className="flex flex-col items-center gap-3 py-16 text-center">
+              <span className="text-4xl">🍽</span>
+              <p className="text-white font-semibold">Tu ne suis personne encore</p>
+              <p className="text-white/40 text-sm">Utilise l&apos;onglet Découvrir pour trouver des gens à suivre.</p>
+              <button
+                onClick={() => setTab('decouvrir')}
+                className="mt-2 px-5 py-2 rounded-full text-white text-xs font-bold"
+                style={{ background: '#E4002B' }}
               >
-                {/* Grid lines */}
-                <svg className="absolute inset-0 w-full h-full opacity-10" viewBox="0 0 100 100" preserveAspectRatio="none">
-                  {[20, 40, 60, 80].map(x => (
-                    <line key={`v${x}`} x1={x} y1="0" x2={x} y2="100" stroke="white" strokeWidth="0.3" />
-                  ))}
-                  {[25, 50, 75].map(y => (
-                    <line key={`h${y}`} x1="0" y1={y} x2="100" y2={y} stroke="white" strokeWidth="0.3" />
-                  ))}
+                Découvrir
+              </button>
+            </div>
+          ) : (
+            amis.map((ami) => {
+              const u = ami.users
+              if (!u) return null
+              const avatarUrl = u.avatar_url ?? `https://picsum.photos/seed/${u.username}/100/100`
+              return (
+                <Link
+                  key={ami.followee_id}
+                  href={`/chef/${ami.followee_id}`}
+                  className="flex items-center gap-3 p-3 rounded-2xl bg-white/5 border border-white/5 active:bg-white/10 transition-colors"
+                >
+                  <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 bg-neutral-700">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white font-bold text-sm">@{u.username}</p>
+                  </div>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={1.5} className="w-4 h-4 opacity-20 flex-shrink-0">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              )
+            })
+          )}
+        </div>
+      )}
+
+      {/* ── Tab: Découvrir ───────────────────── */}
+      {tab === 'decouvrir' && (
+        <div className="flex flex-col flex-1 px-4">
+
+          {/* Search bar */}
+          <div className="flex items-center gap-2 bg-neutral-900 rounded-2xl px-4 py-3 border border-white/5 mb-4">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={1.5} className="w-4 h-4 opacity-40 flex-shrink-0">
+              <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            </svg>
+            <input
+              ref={inputRef}
+              type="text"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder="Restaurant, chef, ville…"
+              className="flex-1 bg-transparent text-white text-sm placeholder:text-white/30 outline-none"
+            />
+            {query && (
+              <button onClick={() => setQuery('')} className="opacity-40">
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={2} className="w-4 h-4">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
+              </button>
+            )}
+          </div>
 
-                {/* City pins */}
-                {CITY_PINS.map(pin => (
-                  <div
-                    key={pin.city}
-                    className="absolute flex flex-col items-center"
-                    style={{ left: `${pin.x}%`, top: `${pin.y}%`, transform: 'translate(-50%, -50%)' }}
-                  >
-                    <div className="w-2 h-2 rounded-full bg-white/60 shadow-lg shadow-white/20" />
-                    <span className="text-white/40 text-[8px] mt-0.5 whitespace-nowrap">{pin.city}</span>
-                  </div>
-                ))}
+          {/* Empty state */}
+          {!isSearching && (
+            <div className="flex flex-col items-center pt-16 text-center">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={1} className="w-12 h-12 opacity-10 mb-4">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+              </svg>
+              <p className="text-white/20 text-sm">Tape un nom pour rechercher</p>
+            </div>
+          )}
 
-                {/* Friend location pins */}
-                {friendLocations.slice(0, 5).map((loc, i) => {
-                  const xPct = ((loc.lng + 180) / 360) * 100
-                  const yPct = ((90 - loc.lat) / 180) * 100
-                  return (
-                    <div
-                      key={loc.user_id}
-                      className="absolute flex items-center justify-center"
-                      style={{ left: `${xPct}%`, top: `${yPct}%`, transform: 'translate(-50%, -50%)' }}
-                    >
-                      <div
-                        className="w-8 h-8 rounded-full border-2 border-white overflow-hidden shadow-lg"
-                        style={{ background: '#E4002B' }}
-                      >
-                        <span className="text-white text-xs font-bold flex items-center justify-center w-full h-full">
-                          {String.fromCharCode(65 + i)}
-                        </span>
+          {/* Loading */}
+          {loadingSearch && (
+            <div className="flex justify-center pt-10">
+              <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+            </div>
+          )}
+
+          {/* No results */}
+          {!loadingSearch && isSearching && !hasResults && (
+            <div className="flex flex-col items-center pt-16 text-center">
+              <p className="text-3xl mb-3">🔍</p>
+              <p className="text-white font-bold text-sm mb-1">Aucun résultat</p>
+              <p className="text-white/30 text-xs">Essaie un autre nom ou une ville</p>
+            </div>
+          )}
+
+          {/* Results — grille 2 colonnes */}
+          {!loadingSearch && isSearching && hasResults && (
+            <div className="grid grid-cols-2 gap-2">
+              {restaurants.map(r => {
+                const seed = r.id.replace(/-/g, '').slice(0, 8)
+                const starColor = r.michelin_stars >= 3 ? '#E4002B' : r.michelin_stars === 2 ? '#f97316' : '#facc15'
+                return (
+                  <Link key={`r-${r.id}`} href={`/restaurant/${r.id}`} className="relative rounded-2xl overflow-hidden bg-neutral-900 aspect-square active:scale-[0.97] transition-transform">
+                    <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(https://picsum.photos/seed/${seed}food/300/300)` }} />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+                    {r.michelin_stars > 0 && (
+                      <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded-full text-white text-[9px] font-black" style={{ background: starColor }}>
+                        {'★'.repeat(r.michelin_stars)}
                       </div>
+                    )}
+                    <div className="absolute bottom-0 left-0 right-0 p-2.5">
+                      <p className="text-white font-black text-xs leading-tight line-clamp-2">{r.name}</p>
+                      <p className="text-white/50 text-[10px] mt-0.5">{r.city}</p>
                     </div>
-                  )
-                })}
-
-                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-                  <span className="text-white/30 text-[10px] uppercase tracking-widest">Live map</span>
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                    <span className="text-white/40 text-[10px]">{friendLocations.length} amis en ligne</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Friend list */}
-              {friendLocations.length === 0 ? (
-                <p className="text-white/30 text-sm text-center py-4">Aucun ami en ligne pour le moment.</p>
-              ) : (
-                friendLocations.map(loc => (
-                  <div key={loc.user_id} className="flex items-center gap-3 p-4 bg-white/5 rounded-2xl border border-white/5">
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm" style={{ background: '#E4002B' }}>
-                      {(loc.users?.username?.[0] ?? '?').toUpperCase()}
+                  </Link>
+                )
+              })}
+              {users.map(u => {
+                const avatarUrl = u.avatar_url ?? `https://picsum.photos/seed/${u.username}/100/100`
+                const isChef = u.role === 'chef'
+                return (
+                  <Link key={`u-${u.id}`} href={`/chef/${u.id}`} className="relative rounded-2xl overflow-hidden bg-neutral-900 aspect-square active:scale-[0.97] transition-transform">
+                    <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${avatarUrl})` }} />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+                    {isChef && (
+                      <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded-full bg-white/20 backdrop-blur-sm text-white text-[9px] font-bold">
+                        Chef
+                      </div>
+                    )}
+                    <div className="absolute bottom-0 left-0 right-0 p-2.5">
+                      <p className="text-white font-black text-xs leading-tight">@{u.username}</p>
+                      <p className="text-white/50 text-[10px] mt-0.5">{isChef ? '👨‍🍳 Chef' : '🍽 Gastronome'}</p>
                     </div>
-                    <div>
-                      <p className="text-white text-sm font-medium">@{loc.users?.username}</p>
-                      <p className="text-white/40 text-xs">{loc.restaurant?.name ?? `${loc.lat.toFixed(1)}, ${loc.lng.toFixed(1)}`}</p>
-                    </div>
-                    <div className="ml-auto flex items-center gap-1">
-                      <div className="w-2 h-2 rounded-full bg-green-400" />
-                      <span className="text-white/30 text-[10px]">En ligne</span>
-                    </div>
-                  </div>
-                ))
-              )}
-            </>
+                  </Link>
+                )
+              })}
+            </div>
           )}
         </div>
       )}

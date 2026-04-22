@@ -8,8 +8,8 @@ type Params = { params: { id: string } }
 export async function GET(_req: Request, { params }: Params) {
   const { data, error } = await supabaseAdmin
     .from('chef_profiles')
-    .select('*, users(id, username, avatar_url), restaurants(id, name, city, michelin_stars, green_stars), chef_signature_dishes(*)')
-    .eq('id', params.id)
+    .select('*, users(id, username, avatar_url), restaurants(id, name, city, country, michelin_stars, green_stars), chef_signature_dishes(*)')
+    .or(`id.eq.${params.id},user_id.eq.${params.id}`)
     .single()
 
   if (error) return apiError(NotFoundError('Profil chef introuvable'))
