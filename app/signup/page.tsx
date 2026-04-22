@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { toast } from 'react-toastify'
 
 const inputClass = 'w-full px-4 py-3.5 bg-gray-100 dark:bg-gray-800 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border border-gray-200 dark:border-gray-700 focus:border-[#E4002B] focus:outline-none text-sm transition-all'
@@ -57,9 +58,11 @@ export default function SignupPage() {
       <div className="hidden lg:flex lg:w-1/2 relative flex-col bg-red-600 dark:bg-red-800">
         {/* Image qui s'affiche en entier */}
         <div className="relative w-full h-full flex flex-col">
-          <img 
+          <Image 
             src="/images/image2.png" 
             alt="FoodTok gastronomie" 
+            width={800}
+            height={600}
             className="w-full h-auto object-contain"
           />
           
@@ -93,21 +96,23 @@ export default function SignupPage() {
           <div className="text-center mb-8">
             <div className="flex justify-center mb-5">
               <div className="bg-gray-100 dark:bg-gray-800 h-18 w-18 rounded-xl p-3 shadow-lg">
-                <img 
+                <Image 
                   src="/icons/etoile-michelin.svg" 
                   alt="Michelin" 
+                  width={56}
+                  height={56}
                   className="w-14 h-14 dark:brightness-90"
                 />
               </div>
             </div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">Créer un compte</h1>
-            <p className="text-gray-600 dark:text-gray-400 text-sm">Rejoins l'aventure</p>
+            <p className="text-gray-600 dark:text-gray-400 text-sm">Rejoins l&apos;aventure</p>
           </div>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                Nom d'utilisateur
+                Nom d&apos;utilisateur
               </label>
               <input 
                 type="text" 

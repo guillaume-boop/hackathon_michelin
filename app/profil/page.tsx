@@ -27,29 +27,29 @@ type Experience = {
 }
 
 const navItems = [
-  { href: '/', label: 'Pour toi', icon: (active: boolean) => (
-    <svg viewBox="0 0 24 24" fill={active ? '#E4002B' : 'none'} stroke="currentColor" strokeWidth={1.5} className="w-6 h-6">
+  { href: '/', label: 'Pour toi', icon: (_active: boolean) => (
+    <svg viewBox="0 0 24 24" fill={_active ? '#E4002B' : 'none'} stroke="currentColor" strokeWidth={1.5} className="w-6 h-6">
       <path strokeLinecap="round" strokeLinejoin="round" d="M11.47 3.841a.75.75 0 0 1 1.06 0l8.69 8.69a.75.75 0 1 0 1.06-1.061l-8.689-8.69a2.25 2.25 0 0 0-3.182 0l-8.69 8.69a.75.75 0 1 0 1.061 1.06l8.69-8.689Z" />
       <path strokeLinecap="round" strokeLinejoin="round" d="m12 5.432 8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 0 1-.75-.75v-4.5a.75.75 0 0 0-.75-.75h-3a.75.75 0 0 0-.75.75V21a.75.75 0 0 1-.75.75H5.625a1.875 1.875 0 0 1-1.875-1.875v-6.198a2.29 2.29 0 0 0 .091-.086L12 5.432Z" />
     </svg>
   )},
-  { href: '/', label: 'Explorer', icon: (active: boolean) => (
+  { href: '/', label: 'Explorer', icon: (_active: boolean) => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-6 h-6">
       <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
     </svg>
   )},
-  { href: '/amis', label: 'Communauté', icon: (active: boolean) => (
+  { href: '/amis', label: 'Communauté', icon: (_active: boolean) => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-6 h-6">
       <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
     </svg>
   )},
-  { href: '/map', label: 'Carte', icon: (active: boolean) => (
-    <svg viewBox="0 0 24 24" fill={active ? '#E4002B' : 'none'} stroke="currentColor" strokeWidth={1.5} className="w-6 h-6">
+  { href: '/map', label: 'Carte', icon: (_active: boolean) => (
+    <svg viewBox="0 0 24 24" fill={_active ? '#E4002B' : 'none'} stroke="currentColor" strokeWidth={1.5} className="w-6 h-6">
       <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
     </svg>
   )},
-  { href: '/profil', label: 'Profil', active: true, icon: (active: boolean) => (
-    <svg viewBox="0 0 24 24" fill={active ? '#E4002B' : 'none'} stroke="currentColor" strokeWidth={1.5} className="w-6 h-6">
+  { href: '/profil', label: 'Profil', active: true, icon: (_active: boolean) => (
+    <svg viewBox="0 0 24 24" fill={_active ? '#E4002B' : 'none'} stroke="currentColor" strokeWidth={1.5} className="w-6 h-6">
       <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
     </svg>
   )},
@@ -123,7 +123,7 @@ export default function ProfilPage() {
           <div className="px-4 py-5">
             <Link href="/" className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-[#E4002B]">
-                <img src="/icons/etoile-michelin.svg" alt="Michelin" className="w-4 h-4 brightness-0 invert" />
+                <Image src="/icons/etoile-michelin.svg" alt="Michelin" width={16} height={16} className="w-4 h-4 brightness-0 invert" />
               </div>
               <span className="font-black text-xl tracking-tight text-gray-900 dark:text-white">MICHELIN</span>
             </Link>
@@ -143,7 +143,7 @@ export default function ProfilPage() {
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900'
                   }`}
                 >
-                  
+                  {item.icon(isActive || !!item.active)}
                   <span>{item.label}</span>
                 </Link>
               )
@@ -191,27 +191,33 @@ export default function ProfilPage() {
               <div className="h-32 bg-gradient-to-r from-red-500 to-red-700 dark:from-red-800 dark:to-red-950 bg-cover bg-center" style={{ backgroundImage: 'url(/images/image3.png)' }} />
               
               <div className="absolute -bottom-12 left-4 lg:left-0">
-              <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white dark:border-black bg-gray-200 dark:bg-gray-700">
-                {profile?.avatar_url ? (
-                <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
-                ) : (
-                <div className="w-full h-full flex items-center justify-center text-3xl font-bold text-white" style={{ background: '#E4002B' }}>
-                  {(profile?.username?.[0] ?? session.user?.name?.[0] ?? '?').toUpperCase()}
+                <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white dark:border-black bg-gray-200 dark:bg-gray-700">
+                  {profile?.avatar_url ? (
+                    <Image 
+                      src={profile.avatar_url} 
+                      alt={profile?.username || 'Avatar'} 
+                      width={96} 
+                      height={96} 
+                      className="w-full h-full object-cover" 
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-3xl font-bold text-white" style={{ background: '#E4002B' }}>
+                      {(profile?.username?.[0] ?? session.user?.name?.[0] ?? '?').toUpperCase()}
+                    </div>
+                  )}
                 </div>
-                )}
-              </div>
               </div>
 
               {/* Bouton menu à la place du bouton déconnexion */}
               <div className="absolute top-4 right-4 lg:right-0">
-              <button
-                onClick={() => setShowMenuModal(true)}
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/70 transition-all"
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
-                </svg>
-              </button>
+                <button
+                  onClick={() => setShowMenuModal(true)}
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/70 transition-all"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
+                  </svg>
+                </button>
               </div>
             </div>
 
@@ -255,19 +261,19 @@ export default function ProfilPage() {
             <div className="border-t border-gray-200 dark:border-gray-800 mt-2">
               <div className="flex">
                 {[
-                  { id: 'posts', label: 'Posts', icon: (active: boolean) => (
-                    <svg viewBox="0 0 24 24" fill={active ? '#E4002B' : 'none'} stroke="currentColor" strokeWidth={1.5} className="w-5 h-5">
+                  { id: 'posts', label: 'Posts', icon: (_active: boolean) => (
+                    <svg viewBox="0 0 24 24" fill={_active ? '#E4002B' : 'none'} stroke="currentColor" strokeWidth={1.5} className="w-5 h-5">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h2v12H3zm6 0h2v12H9zm6 0h2v12h-2zm6 0h2v12h-2z" />
                       <path strokeLinecap="round" strokeLinejoin="round" d="M2 6h20v1H2z" />
                     </svg>
                   )},
-                  { id: 'likes', label: 'J\'aime', icon: (active: boolean) => (
-                    <svg viewBox="0 0 24 24" fill={active ? '#E4002B' : 'none'} stroke="currentColor" strokeWidth={1.5} className="w-5 h-5">
+                  { id: 'likes', label: 'J\'aime', icon: (_active: boolean) => (
+                    <svg viewBox="0 0 24 24" fill={_active ? '#E4002B' : 'none'} stroke="currentColor" strokeWidth={1.5} className="w-5 h-5">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
                     </svg>
                   )},
-                  { id: 'collections', label: 'Collections', icon: (active: boolean) => (
-                    <svg viewBox="0 0 24 24" fill={active ? '#E4002B' : 'none'} stroke="currentColor" strokeWidth={1.5} className="w-5 h-5">
+                  { id: 'collections', label: 'Collections', icon: (_active: boolean) => (
+                    <svg viewBox="0 0 24 24" fill={_active ? '#E4002B' : 'none'} stroke="currentColor" strokeWidth={1.5} className="w-5 h-5">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5-3.9 19.5m-2.1-19.5-3.9 19.5" />
                     </svg>
                   )},
@@ -299,8 +305,8 @@ export default function ProfilPage() {
                 <>
                   {loading ? (
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                      {Array.from({ length: 6 }).map((_, i) => (
-                        <div key={i} className="aspect-square rounded-xl bg-gray-100 dark:bg-gray-800 animate-pulse" />
+                      {Array.from({ length: 6 }).map((_, index) => (
+                        <div key={index} className="aspect-square rounded-xl bg-gray-100 dark:bg-gray-800 animate-pulse" />
                       ))}
                     </div>
                   ) : experiences.length === 0 ? (
@@ -324,8 +330,8 @@ export default function ProfilPage() {
                           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                             <div className="text-center">
                               <div className="flex items-center justify-center gap-0.5 mb-1">
-                                {Array.from({ length: exp.rating }).map((_, i) => (
-                                  <svg key={i} viewBox="0 0 24 24" fill="#E4002B" className="w-3 h-3">
+                                {Array.from({ length: exp.rating }).map((_, idx) => (
+                                  <svg key={idx} viewBox="0 0 24 24" fill="#E4002B" className="w-3 h-3">
                                     <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                                   </svg>
                                 ))}
@@ -366,7 +372,7 @@ export default function ProfilPage() {
 
       {/* Modal menu style TikTok */}
       {showMenuModal && (
-        <div className="fixed inset-0 z-50 flex items-end  justify-center" onClick={() => setShowMenuModal(false)}>
+        <div className="fixed inset-0 z-50 flex items-end justify-center" onClick={() => setShowMenuModal(false)}>
           {/* Overlay avec animation */}
           <div 
             className="absolute inset-0 bg-black/60 transition-opacity duration-300"

@@ -49,7 +49,7 @@ export default function BottomNav() {
   return (
     <nav className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-lg bg-white/90 dark:bg-black/90 backdrop-blur-xl rounded-full py-2 shadow-lg border border-gray-200 dark:border-gray-800">
       <div className="flex items-stretch justify-around">
-        {tabs.map(({ href, icon, label }) => {
+        {tabs.map(({ href, icon }) => { // Supprimé 'label' de la destructuration
           const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href)
           return (
             <Link
@@ -62,11 +62,7 @@ export default function BottomNav() {
               <div className={`transition-transform duration-150 ${isActive ? 'scale-110' : 'scale-100 group-hover:scale-105'}`}>
                 {icon(isActive)}
               </div>
-              {/* <span className={`text-[10px] font-medium mt-1 transition-all duration-150 ${
-                isActive ? 'opacity-100 text-[#E4002B]' : 'opacity-0 group-hover:opacity-100'
-              }`}>
-                {label}
-              </span> */}
+              {/* Le label est commenté dans le JSX donc on n'en a pas besoin dans la destructuration */}
             </Link>
           )
         })}

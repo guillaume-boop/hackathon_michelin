@@ -38,29 +38,29 @@ const CITY_PINS = [
 
 // Navigation items pour la sidebar
 const navItems = [
-  { href: '/', label: 'Pour toi', icon: (active: boolean) => (
-    <svg viewBox="0 0 24 24" fill={active ? '#E4002B' : 'none'} stroke="currentColor" strokeWidth={1.5} className="w-6 h-6">
+  { href: '/', label: 'Pour toi', icon: (_active: boolean) => (
+    <svg viewBox="0 0 24 24" fill={_active ? '#E4002B' : 'none'} stroke="currentColor" strokeWidth={1.5} className="w-6 h-6">
       <path strokeLinecap="round" strokeLinejoin="round" d="M11.47 3.841a.75.75 0 0 1 1.06 0l8.69 8.69a.75.75 0 1 0 1.06-1.061l-8.689-8.69a2.25 2.25 0 0 0-3.182 0l-8.69 8.69a.75.75 0 1 0 1.061 1.06l8.69-8.689Z" />
       <path strokeLinecap="round" strokeLinejoin="round" d="m12 5.432 8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 0 1-.75-.75v-4.5a.75.75 0 0 0-.75-.75h-3a.75.75 0 0 0-.75.75V21a.75.75 0 0 1-.75.75H5.625a1.875 1.875 0 0 1-1.875-1.875v-6.198a2.29 2.29 0 0 0 .091-.086L12 5.432Z" />
     </svg>
   )},
-  { href: '/explore', label: 'Explorer', icon: (active: boolean) => (
+  { href: '/', label: 'Explorer', icon: (_active: boolean) => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-6 h-6">
       <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
     </svg>
   )},
-  { href: '/following', label: 'Abonnements', icon: (active: boolean) => (
+  { href: '/amis', label: 'Communauté', icon: (_active: boolean) => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-6 h-6">
       <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
     </svg>
   )},
-  { href: '/liked', label: 'J\'aime', icon: (active: boolean) => (
-    <svg viewBox="0 0 24 24" fill={active ? '#E4002B' : 'none'} stroke="currentColor" strokeWidth={1.5} className="w-6 h-6">
+  { href: '/map', label: 'Carte', icon: (_active: boolean) => (
+    <svg viewBox="0 0 24 24" fill={_active ? '#E4002B' : 'none'} stroke="currentColor" strokeWidth={1.5} className="w-6 h-6">
       <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
     </svg>
   )},
-  { href: '/profil', label: 'Profil', icon: (active: boolean) => (
-    <svg viewBox="0 0 24 24" fill={active ? '#E4002B' : 'none'} stroke="currentColor" strokeWidth={1.5} className="w-6 h-6">
+  { href: '/profil', label: 'Profil', icon: (_active: boolean) => (
+    <svg viewBox="0 0 24 24" fill={_active ? '#E4002B' : 'none'} stroke="currentColor" strokeWidth={1.5} className="w-6 h-6">
       <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
     </svg>
   )},
@@ -111,8 +111,7 @@ export default function AmisPage() {
           <div className="px-4 py-5">
             <Link href="/" className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-[#E4002B]">
-                <img src="/icons/etoile-michelin.svg" alt="Michelin" className="w-4 h-4 brightness-0 invert" />
-              </div>
+                <Image src="/icons/etoile-michelin.svg" alt="Michelin" width={16} height={16} className="w-4 h-4 brightness-0 invert" />              </div>
               <span className="font-black text-xl tracking-tight text-gray-900 dark:text-white">MICHELIN</span>
             </Link>
           </div>
@@ -221,8 +220,8 @@ export default function AmisPage() {
                   </p>
 
                   {loading ? (
-                    Array.from({ length: 4 }).map((_, i) => (
-                      <div key={i} className="h-20 rounded-xl bg-gray-100 dark:bg-gray-800 animate-pulse mb-3" />
+                    Array.from({ length: 4 }).map((__, _i) => (
+                      <div key={_i} className="h-20 rounded-xl bg-gray-100 dark:bg-gray-800 animate-pulse mb-3" />
                     ))
                   ) : chefs.length === 0 ? (
                     <div className="text-center py-12">
@@ -238,7 +237,13 @@ export default function AmisPage() {
                           <Link href={`/chef/${chef.id}`} className="shrink-0">
                             <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
                               {chef.users?.avatar_url ? (
-                                <img src={chef.users.avatar_url} alt="" className="w-full h-full object-cover" />
+                                <Image 
+                                  src={chef.users.avatar_url} 
+                                  alt={chef.users?.username || 'Avatar'} 
+                                  width={48} 
+                                  height={48} 
+                                  className="w-full h-full object-cover" 
+                                />
                               ) : (
                                 <div className="w-full h-full flex items-center justify-center text-base font-bold text-white" style={{ background: '#E4002B' }}>
                                   {(chef.users?.username?.[0] ?? '?').toUpperCase()}
@@ -326,7 +331,7 @@ export default function AmisPage() {
                         ))}
 
                         {/* Friend location pins */}
-                        {friendLocations.slice(0, 5).map((loc, i) => {
+                        {friendLocations.slice(0, 5).map((loc, _i) => {
                           const xPct = ((loc.lng + 180) / 360) * 100
                           const yPct = ((90 - loc.lat) / 180) * 100
                           return (

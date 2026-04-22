@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
@@ -43,29 +42,29 @@ type Dish = {
 
 // Navigation items pour la sidebar
 const navItems = [
-  { href: '/', label: 'Pour toi', icon: (active: boolean) => (
-    <svg viewBox="0 0 24 24" fill={active ? '#E4002B' : 'none'} stroke="currentColor" strokeWidth={1.5} className="w-6 h-6">
+  { href: '/', label: 'Pour toi', icon: (_active: boolean) => (
+    <svg viewBox="0 0 24 24" fill={_active ? '#E4002B' : 'none'} stroke="currentColor" strokeWidth={1.5} className="w-6 h-6">
       <path strokeLinecap="round" strokeLinejoin="round" d="M11.47 3.841a.75.75 0 0 1 1.06 0l8.69 8.69a.75.75 0 1 0 1.06-1.061l-8.689-8.69a2.25 2.25 0 0 0-3.182 0l-8.69 8.69a.75.75 0 1 0 1.061 1.06l8.69-8.689Z" />
       <path strokeLinecap="round" strokeLinejoin="round" d="m12 5.432 8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 0 1-.75-.75v-4.5a.75.75 0 0 0-.75-.75h-3a.75.75 0 0 0-.75.75V21a.75.75 0 0 1-.75.75H5.625a1.875 1.875 0 0 1-1.875-1.875v-6.198a2.29 2.29 0 0 0 .091-.086L12 5.432Z" />
     </svg>
   )},
-  { href: '/', label: 'Explorer', icon: (active: boolean) => (
+  { href: '/', label: 'Explorer', icon: (_active: boolean) => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-6 h-6">
       <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
     </svg>
   )},
-  { href: '/amis', label: 'Communauté', icon: (active: boolean) => (
+  { href: '/amis', label: 'Communauté', icon: (_active: boolean) => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-6 h-6">
       <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
     </svg>
   )},
-  { href: '/map', label: 'Carte', icon: (active: boolean) => (
-    <svg viewBox="0 0 24 24" fill={active ? '#E4002B' : 'none'} stroke="currentColor" strokeWidth={1.5} className="w-6 h-6">
+  { href: '/map', label: 'Carte', icon: (_active: boolean) => (
+    <svg viewBox="0 0 24 24" fill={_active ? '#E4002B' : 'none'} stroke="currentColor" strokeWidth={1.5} className="w-6 h-6">
       <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
     </svg>
   )},
-  { href: '/profil', label: 'Profil', icon: (active: boolean) => (
-    <svg viewBox="0 0 24 24" fill={active ? '#E4002B' : 'none'} stroke="currentColor" strokeWidth={1.5} className="w-6 h-6">
+  { href: '/profil', label: 'Profil', icon: (_active: boolean) => (
+    <svg viewBox="0 0 24 24" fill={_active ? '#E4002B' : 'none'} stroke="currentColor" strokeWidth={1.5} className="w-6 h-6">
       <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
     </svg>
   )},
@@ -132,7 +131,7 @@ export default function RestaurantPageClient({
 }) {
   const { data: session } = useSession()
   const pathname = usePathname()
-  const router = useRouter()
+  // Supprimé: const router = useRouter() - non utilisé
   const [liked, setLiked] = useState(false)
   const [openVideo, setOpenVideo] = useState<string | null>(null)
   const [showAuthGate, setShowAuthGate] = useState(false)
@@ -165,7 +164,7 @@ export default function RestaurantPageClient({
             <div className="px-4 py-5">
               <Link href="/" className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-[#E4002B]">
-                  <img src="/icons/etoile-michelin.svg" alt="Michelin" className="w-4 h-4 brightness-0 invert" />
+                  <Image src="/icons/etoile-michelin.svg" alt="Michelin" width={16} height={16} className="w-4 h-4 brightness-0 invert" />
                 </div>
                 <span className="font-black text-xl tracking-tight text-gray-900 dark:text-white">MICHELIN</span>
               </Link>
@@ -303,7 +302,7 @@ export default function RestaurantPageClient({
                         return (
                           <Link key={chef.id} href={`/chef/${chef.id}`} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                             <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 flex-shrink-0">
-                              <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+                              <Image src={avatarUrl} alt={chef.users?.username ?? 'Chef'} width={48} height={48} className="w-full h-full object-cover" />
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-gray-900 dark:text-white font-semibold text-sm">{chef.users?.username ?? 'Chef'}</p>
@@ -320,53 +319,53 @@ export default function RestaurantPageClient({
                 )}
 
                 {/* Menu */}
-               <div className="mb-6">
-  <div className="flex items-center justify-between mb-3">
-    <h2 className="text-gray-900 dark:text-white font-bold text-sm">Menu Dégustation</h2>
-    <button className="text-[#E4002B] text-xs font-semibold uppercase tracking-wider hover:opacity-80 transition-opacity">
-      Voir tout
-    </button>
-  </div>
-  
-  {/* Container avec scroll horizontal et barre cachée */}
-  <div className="relative">
-    <div 
-      className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide"
-      style={{
-        scrollbarWidth: 'none', // Firefox
-        msOverflowStyle: 'none', // IE/Edge
-      }}
-    >
-      {dishes.map((dish) => {
-        const img = dish.photo_url ?? `https://picsum.photos/seed/${dish.name.replace(/\s/g, '').toLowerCase()}/300/300`
-        return (
-          <div 
-            key={dish.id} 
-            className="group flex-shrink-0 w-40 rounded-xl overflow-hidden bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 hover:shadow-lg hover:border-[#E4002B]/30 transition-all duration-300"
-          >
-            <div className="relative w-full h-24 bg-cover bg-center transition-transform duration-300 group-hover:scale-105" style={{ backgroundImage: `url(${img})` }}>
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300" />
-            </div>
-            <div className="p-2">
-              <p className="text-gray-900 dark:text-white font-semibold text-xs uppercase leading-tight line-clamp-1">
-                {dish.name}
-              </p>
-              {dish.description && (
-                <p className="text-gray-500 dark:text-gray-400 text-[10px] leading-snug mt-1 line-clamp-2">
-                  {dish.description}
-                </p>
-              )}
-            </div>
-          </div>
-        )
-      })}
-    </div>
-    
-    {/* Dégradés aux extrémités pour indiquer le scroll (optionnel) */}
-    <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white dark:from-black to-transparent pointer-events-none" />
-    <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white dark:from-black to-transparent pointer-events-none" />
-  </div>
-</div>
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <h2 className="text-gray-900 dark:text-white font-bold text-sm">Menu Dégustation</h2>
+                    <button className="text-[#E4002B] text-xs font-semibold uppercase tracking-wider hover:opacity-80 transition-opacity">
+                      Voir tout
+                    </button>
+                  </div>
+                  
+                  {/* Container avec scroll horizontal et barre cachée */}
+                  <div className="relative">
+                    <div 
+                      className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide"
+                      style={{
+                        scrollbarWidth: 'none', // Firefox
+                        msOverflowStyle: 'none', // IE/Edge
+                      }}
+                    >
+                      {dishes.map((dish) => {
+                        const img = dish.photo_url ?? `https://picsum.photos/seed/${dish.name.replace(/\s/g, '').toLowerCase()}/300/300`
+                        return (
+                          <div 
+                            key={dish.id} 
+                            className="group flex-shrink-0 w-40 rounded-xl overflow-hidden bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 hover:shadow-lg hover:border-[#E4002B]/30 transition-all duration-300"
+                          >
+                            <div className="relative w-full h-24 bg-cover bg-center transition-transform duration-300 group-hover:scale-105" style={{ backgroundImage: `url(${img})` }}>
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300" />
+                            </div>
+                            <div className="p-2">
+                              <p className="text-gray-900 dark:text-white font-semibold text-xs uppercase leading-tight line-clamp-1">
+                                {dish.name}
+                              </p>
+                              {dish.description && (
+                                <p className="text-gray-500 dark:text-gray-400 text-[10px] leading-snug mt-1 line-clamp-2">
+                                  {dish.description}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                    
+                    {/* Dégradés aux extrémités pour indiquer le scroll (optionnel) */}
+                    <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white dark:from-black to-transparent pointer-events-none" />
+                    <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white dark:from-black to-transparent pointer-events-none" />
+                  </div>
+                </div>
 
                 {/* Infos pratiques */}
                 <div className="mb-6">
@@ -407,13 +406,13 @@ export default function RestaurantPageClient({
         </div>
 
         {/* Sticky CTA (mobile et desktop) */}
-      <div className="fixed bottom-0 left-0 right-0  z-[100] px-4 pb-6 pt-4 bg-gradient-to-t from-white dark:from-black to-transparent">
-  <div className="flex justify-center">
-    <button className="w-full max-w-[300px] py-3.5 rounded-xl font-bold text-white text-sm tracking-wide uppercase active:scale-[0.98] transition-transform" style={{ background: '#E4002B' }}>
-      Réserver une table
-    </button>
-  </div>
-</div>
+        <div className="fixed bottom-0 left-0 right-0 z-[100] px-4 pb-6 pt-4 bg-gradient-to-t from-white dark:from-black to-transparent">
+          <div className="flex justify-center">
+            <button className="w-full max-w-[300px] py-3.5 rounded-xl font-bold text-white text-sm tracking-wide uppercase active:scale-[0.98] transition-transform" style={{ background: '#E4002B' }}>
+              Réserver une table
+            </button>
+          </div>
+        </div>
 
         {/* Bottom nav mobile */}
         <div className="lg:hidden">

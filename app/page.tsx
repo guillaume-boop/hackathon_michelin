@@ -91,8 +91,8 @@ export default function FeedPage() {
         {/* Logo */}
         <div className="px-6 py-5">
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-michelin-red">
-             <img src="/icons/etoile-michelin.svg" alt="Michelin" className="w-4 h-4 brightness-0 invert" />
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-[#E4002B]">
+              <Image src="/icons/etoile-michelin.svg" alt="Michelin" width={16} height={16} className="w-4 h-4 brightness-0 invert" />
             </div>
           </Link>
         </div>
@@ -228,7 +228,7 @@ export default function FeedPage() {
                     {f.icon && f.val !== -1 && (
                       <div className="flex items-center gap-0.5">
                         {[...Array(f.val)].map((_, i) => (
-                          <img key={i} src={f.icon} alt="étoile Michelin" className="w-5 h-5" />
+                          <Image key={i} src={f.icon!} alt="étoile Michelin" width={20} height={20} className="w-5 h-5" />
                         ))}
                       </div>
                     )}
@@ -243,9 +243,6 @@ export default function FeedPage() {
 
         {/* Header desktop avec logo, recherche et connexion */}
         <div className="hidden lg:flex items-center justify-between px-6 py-3 border-b border-gray-100 dark:border-gray-800 sticky top-0 z-20 bg-white dark:bg-black">
-          {/* Logo à gauche */}
-         
-
           {/* Barre de recherche au centre */}
           <div className="flex-1 max-w-xl mx-8">
             <div className="relative">
@@ -309,44 +306,6 @@ export default function FeedPage() {
             )}
           </div>
         </div>
-
-        {/* Filtres pills en dessous du header desktop */}
-        {/* <div className="hidden lg:flex items-center justify-center px-6 py-3 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-black">
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
-            {[
-              { val: null, label: 'Tous' },
-              { val: 1, label: '1', icon: '/icons/etoile-michelin.svg' },
-              { val: 2, label: '2', icon: '/icons/etoile-michelin.svg' },
-              { val: 3, label: '3', icon: '/icons/etoile-michelin.svg' },
-              { val: -1, label: 'Green', icon: '🌿' },
-            ].map(f => (
-              <button
-                key={String(f.val)}
-                onClick={() => setFilter(f.val)}
-                className={`px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap transition-colors flex items-center gap-1.5 ${
-                  filter === f.val
-                    ? f.val === -1 ? 'bg-green-600 text-white' : 'bg-[#E4002B] text-white'
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
-                }`}
-              >
-                {f.val !== null && f.val !== -1 && (
-                  <div className="flex items-center gap-0.5">
-                    {[...Array(f.val)].map((_, i) => (
-                      <img
-                        key={i}
-                        src={f.icon}
-                        alt="étoile Michelin"
-                        className={`w-4 h-4 ${filter === f.val ? 'brightness-0 invert' : ''}`}
-                      />
-                    ))}
-                  </div>
-                )}
-                {f.val === -1 && f.icon}
-                {f.val === null && f.label}
-              </button>
-            ))}
-          </div>
-        </div> */}
 
         {/* Snap-scroll video feed */}
         <div className="flex-1 flex items-center justify-center relative overflow-hidden">
@@ -439,10 +398,12 @@ export default function FeedPage() {
                 <div className="flex items-center gap-1">
                   <div className="flex items-center gap-0.5">
                     {[...Array(currentPost.restaurants.michelin_stars)].map((_, i) => (
-                      <img
+                      <Image
                         key={i}
                         src="/icons/etoile-michelin.svg"
                         alt="étoile Michelin"
+                        width={16}
+                        height={16}
                         className="w-4 h-4"
                       />
                     ))}

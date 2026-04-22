@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { toast } from 'react-toastify'
 
 const inputClass = 'w-full px-4 py-3.5 bg-gray-200  rounded-xl text-gray-900 dark:text-white placeholder-gray-600 dark:placeholder-gray-500 border border-gray-200 dark:border-gray-800 focus:border-[#E4002B] focus:outline-none text-sm transition-all  dark:bg-gray-900/90 backdrop-blur-sm'
@@ -52,9 +53,11 @@ export default function LoginPage() {
         <div className="text-center mb-10">
           <div className="flex justify-center mb-5">
             <div className="bg-gray-200 dark:bg-gray-800 h-18 w-18 rounded-xl p-3 shadow-sm">
-              <img 
+              <Image 
                 src="/icons/etoile-michelin.svg" 
                 alt="Michelin" 
+                width={56}
+                height={56}
                 className="w-14 h-14"
               />
             </div>

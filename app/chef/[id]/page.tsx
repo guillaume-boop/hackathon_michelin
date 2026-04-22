@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import Stars from '@/components/ui/Stars'
 import BottomNav from '@/components/layout/BottomNav'
 import AuthGateModal from '@/components/ui/AuthGateModal'
@@ -30,6 +31,7 @@ type FeedPost = {
   likes_count: number
   created_at: string
   restaurants: { name: string; michelin_stars: number }
+  user_id: string
 }
 
 export default function ChefPage() {
@@ -67,7 +69,7 @@ export default function ChefPage() {
     if (!chef) return
     fetch(`/api/feed?limit=20`)
       .then(r => r.json())
-      .then((all: (FeedPost & { user_id: string })[]) => {
+      .then((all: FeedPost[]) => {
         setPosts(Array.isArray(all) ? all.filter(p => p.user_id === chef.user_id) : [])
       })
   }, [chef])
@@ -119,7 +121,13 @@ export default function ChefPage() {
         <div className="relative flex items-start gap-4">
           <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-white/20 flex-shrink-0">
             {chef.users?.avatar_url ? (
-              <img src={chef.users.avatar_url} alt="" className="w-full h-full object-cover" />
+              <Image 
+                src={chef.users.avatar_url} 
+                alt={chef.users?.username || 'Avatar'} 
+                width={80} 
+                height={80} 
+                className="w-full h-full object-cover" 
+              />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-3xl font-bold" style={{ background: '#E4002B' }}>
                 {(chef.users?.username?.[0] ?? '?').toUpperCase()}
@@ -165,7 +173,13 @@ export default function ChefPage() {
                 <div key={dish.id} className="flex-shrink-0 w-40 rounded-2xl overflow-hidden border border-white/10" style={{ background: 'rgba(255,255,255,0.04)' }}>
                   <div className="h-28 flex items-center justify-center" style={{ background: 'rgba(228,0,43,0.1)' }}>
                     {dish.photo_url ? (
-                      <img src={dish.photo_url} alt={dish.name} className="w-full h-full object-cover" />
+                      <Image 
+                        src={dish.photo_url} 
+                        alt={dish.name} 
+                        width={160} 
+                        height={112} 
+                        className="w-full h-full object-cover" 
+                      />
                     ) : (
                       <span className="text-4xl">🍽️</span>
                     )}
@@ -189,10 +203,7 @@ export default function ChefPage() {
           <div className="grid grid-cols-3 gap-1">
             {posts.map(post => (
               <Link href="/" key={post.id}>
-                <div
-                  className="aspect-[9/16] rounded-xl overflow-hidden flex items-center justify-center"
-                  style={{ background: 'rgba(255,255,255,0.06)' }}
-                >
+                <div className="relative aspect-[9/16] rounded-xl overflow-hidden flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.06)' }}>
                   {post.content_url ? (
                     <video src={post.content_url} className="w-full h-full object-cover" preload="metadata" />
                   ) : (
