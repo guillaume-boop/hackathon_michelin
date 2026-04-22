@@ -135,6 +135,30 @@ create table if not exists chef_signature_dishes (
   "order" integer not null default 0
 );
 
+-- Experience likes
+create table if not exists experience_likes (
+  experience_id uuid not null references experiences(id) on delete cascade,
+  user_id       uuid not null references users(id) on delete cascade,
+  created_at    timestamptz default now(),
+  primary key (experience_id, user_id)
+);
+
+-- Experience bookmarks
+create table if not exists experience_bookmarks (
+  experience_id uuid not null references experiences(id) on delete cascade,
+  user_id       uuid not null references users(id) on delete cascade,
+  created_at    timestamptz default now(),
+  primary key (experience_id, user_id)
+);
+
+-- Feed bookmarks
+create table if not exists feed_bookmarks (
+  post_id    uuid not null references feed_posts(id) on delete cascade,
+  user_id    uuid not null references users(id) on delete cascade,
+  created_at timestamptz default now(),
+  primary key (post_id, user_id)
+);
+
 -- Indexes for common lookups
 create index if not exists idx_experiences_user_id on experiences(user_id);
 create index if not exists idx_experiences_restaurant_id on experiences(restaurant_id);
@@ -143,3 +167,6 @@ create index if not exists idx_feed_posts_created_at on feed_posts(created_at de
 create index if not exists idx_follows_follower on follows(follower_id);
 create index if not exists idx_follows_followee on follows(followee_id);
 create index if not exists idx_circle_members_user on circle_members(user_id);
+ALTER TABLE feed_posts ALTER COLUMN user_id DROP NOT NULL;
+ALTER TABLE feed_posts ADD COLUMN IF NOT EXISTS chef_profile_id uuid references chef_profiles(id) on delete set null;
+ALTER TABLE feed_posts DROP COLUMN IF EXISTS user_id;

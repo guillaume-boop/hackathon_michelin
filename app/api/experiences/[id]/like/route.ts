@@ -7,16 +7,15 @@ type Params = { params: { id: string } }
 
 export async function GET(_req: Request, { params }: Params) {
   const me = await getCurrentUser()
-  if (!me) return NextResponse.json({ saved: false })
 
-  const { data } = await supabaseAdmin
-    .from('feed_bookmarks')
-    .select('user_id')
-    .eq('post_id', params.id)
-    .eq('user_id', me.id)
-    .maybeSingle()
+  const [{ count }, { data: myLike }] = await Promise.all([
+    supabaseAdmin.from('experience_likes').select('*', { count: 'exact', head: true }).eq('experience_id', params.id),
+    me
+      ? supabaseAdmin.from('experience_likes').select('user_id').eq('experience_id', params.id).eq('user_id', me.id).maybeSingle()
+      : Promise.resolve({ data: null }),
+  ])
 
-  return NextResponse.json({ saved: !!data })
+  return NextResponse.json({ count: count ?? 0, liked: !!myLike })
 }
 
 export async function POST(_req: Request, { params }: Params) {
@@ -24,21 +23,21 @@ export async function POST(_req: Request, { params }: Params) {
   if (!me) return apiError(UnauthorizedError())
 
   const { error } = await supabaseAdmin
-    .from('feed_bookmarks')
-    .insert({ post_id: params.id, user_id: me.id })
+    .from('experience_likes')
+    .insert({ experience_id: params.id, user_id: me.id })
 
-  if (error) return apiError(ServerError(error.message))
-    return new NextResponse(null, { status: 204 })
-  }
+  if (error && error.code !== '23505') return apiError(ServerError(error.message))
+  return new NextResponse(null, { status: 204 })
+}
 
 export async function DELETE(_req: Request, { params }: Params) {
   const me = await getCurrentUser()
   if (!me) return apiError(UnauthorizedError())
 
-  const { error } = await supabaseAdmin
-    .from('feed_bookmarks')
+  await supabaseAdmin
+    .from('experience_likes')
     .delete()
-    .eq('post_id', params.id)
+    .eq('experience_id', params.id)
     .eq('user_id', me.id)
 
   return new NextResponse(null, { status: 204 })

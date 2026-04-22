@@ -10,7 +10,7 @@ export async function GET(request: Request) {
   const userId = searchParams.get('user_id')
   const restaurantId = searchParams.get('restaurant_id')
 
-  let query = supabaseAdmin.from('experiences').select('*').order('visited_at', { ascending: false })
+  let query = supabaseAdmin.from('experiences').select('*, restaurants(id, name, city, michelin_stars)').order('visited_at', { ascending: false })
   if (userId) query = query.eq('user_id', userId)
   if (restaurantId) query = query.eq('restaurant_id', restaurantId)
 
