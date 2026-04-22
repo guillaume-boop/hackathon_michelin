@@ -117,7 +117,7 @@ export default function FeedPage() {
           </div>
 
           {/* Search button */}
-          <Link href="/search" className="p-3 rounded-full bg-black/40 backdrop-blur-sm hover:bg-black/60 transition-colors" title="Recherche">
+          <Link href="/decouvrir" className="p-3 rounded-full bg-black/40 backdrop-blur-sm hover:bg-black/60 transition-colors" title="Recherche">
             <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={1.5} className="w-6 h-6">
               <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
             </svg>
@@ -157,6 +157,7 @@ export default function FeedPage() {
               <VideoCard
                 post={post}
                 isActive={i === activeIndex}
+                muted={muted}
                 onLike={handleLike}
                 onAuthRequired={() => setShowAuthGate(true)}
                 sessionUserId={session?.user?.id}

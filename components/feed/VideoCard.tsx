@@ -17,14 +17,14 @@ type Post = {
 interface VideoCardProps {
   post: Post
   isActive: boolean
+  muted: boolean
   onLike: (postId: string) => void
   onAuthRequired: () => void
   sessionUserId?: string | null
 }
 
-export default function VideoCard({ post, isActive, onLike, onAuthRequired, sessionUserId }: VideoCardProps) {
+export default function VideoCard({ post, isActive, muted, onLike, onAuthRequired, sessionUserId }: VideoCardProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
-  const [muted, setMuted] = useState(true)
   const [liked, setLiked] = useState(false)
   const [likeCount, setLikeCount] = useState(post.likes_count)
   const [videoError, setVideoError] = useState(false)
@@ -87,7 +87,6 @@ export default function VideoCard({ post, isActive, onLike, onAuthRequired, sess
           preload="auto"
           onCanPlay={() => setVideoReady(true)}
           onError={() => setVideoError(true)}
-          onClick={() => setMuted(m => !m)}
         />
       ) : (
         <div className={`absolute inset-0 bg-gradient-to-b ${bgGradients[stars] ?? bgGradients[0]} flex items-center justify-center`}>

@@ -5,6 +5,20 @@ import { apiError, UnauthorizedError, BadRequestError, ServerError } from '@/lib
 
 type Params = { params: { id: string } }
 
+export async function GET(_req: Request, { params }: Params) {
+  const me = await getCurrentUser()
+  if (!me) return NextResponse.json({ following: false })
+
+  const { data } = await supabaseAdmin
+    .from('follows')
+    .select('followee_id')
+    .eq('follower_id', me.id)
+    .eq('followee_id', params.id)
+    .maybeSingle()
+
+  return NextResponse.json({ following: !!data })
+}
+
 export async function POST(_req: Request, { params }: Params) {
   const me = await getCurrentUser()
   if (!me) return apiError(UnauthorizedError())
