@@ -11,6 +11,8 @@ type Post = {
   content_url: string | null
   likes_count: number
   created_at: string
+  user_liked?: boolean
+  user_bookmarked?: boolean
   restaurants: { id: string; name: string; city: string; michelin_stars: number; green_stars?: boolean; description?: string }
 }
 
@@ -18,15 +20,15 @@ interface VideoCardProps {
   post: Post
   isActive: boolean
   muted: boolean
-  onLike: (postId: string) => void
   onAuthRequired: () => void
   sessionUserId?: string | null
 }
 
-export default function VideoCard({ post, isActive, muted, onLike, onAuthRequired, sessionUserId }: VideoCardProps) {
+export default function VideoCard({ post, isActive, muted, onAuthRequired, sessionUserId }: VideoCardProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
-  const [liked, setLiked] = useState(false)
+  const [liked, setLiked] = useState(post.user_liked ?? false)
   const [likeCount, setLikeCount] = useState(post.likes_count)
+  const [bookmarked, setBookmarked] = useState(post.user_bookmarked ?? false)
   const [videoError, setVideoError] = useState(false)
   const [videoReady, setVideoReady] = useState(false)
 
@@ -45,13 +47,31 @@ export default function VideoCard({ post, isActive, muted, onLike, onAuthRequire
     }
   }, [isActive, videoError])
 
-  const handleLike = useCallback(() => {
+  const handleLike = useCallback(async () => {
     if (!sessionUserId) { onAuthRequired(); return }
     const next = !liked
     setLiked(next)
     setLikeCount(c => next ? c + 1 : c - 1)
-    onLike(post.id)
-  }, [liked, sessionUserId, onAuthRequired, onLike, post.id])
+    try {
+      const res = await fetch(`/api/feed/posts/${post.id}/like`, { method: next ? 'POST' : 'DELETE' })
+      if (!res.ok) throw new Error()
+    } catch {
+      setLiked(!next)
+      setLikeCount(c => next ? c - 1 : c + 1)
+    }
+  }, [liked, sessionUserId, onAuthRequired, post.id])
+
+  const handleBookmark = useCallback(async () => {
+    if (!sessionUserId) { onAuthRequired(); return }
+    const next = !bookmarked
+    setBookmarked(next)
+    try {
+      const res = await fetch(`/api/feed/posts/${post.id}/bookmark`, { method: next ? 'POST' : 'DELETE' })
+      if (!res.ok) throw new Error()
+    } catch {
+      setBookmarked(!next)
+    }
+  }, [bookmarked, sessionUserId, onAuthRequired, post.id])
 
   const stars = post.restaurants?.michelin_stars ?? 0
   const bgGradients: Record<number, string> = {
@@ -120,9 +140,9 @@ export default function VideoCard({ post, isActive, muted, onLike, onAuthRequire
         </button>
 
         {/* Save */}
-        <button>
-          <div className="w-12 h-12 rounded-2xl bg-black/40 border border-white/20 backdrop-blur-sm flex items-center justify-center active:scale-90 transition-transform">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={1.5} className="w-6 h-6">
+        <button onClick={handleBookmark} className="flex flex-col items-center gap-1">
+          <div className={`w-12 h-12 rounded-2xl backdrop-blur-sm flex items-center justify-center transition-all duration-150 active:scale-90 ${bookmarked ? 'bg-white' : 'bg-black/40 border border-white/20'}`}>
+            <svg viewBox="0 0 24 24" fill={bookmarked ? '#E4002B' : 'none'} stroke={bookmarked ? '#E4002B' : 'white'} strokeWidth={1.5} className="w-6 h-6">
               <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
             </svg>
           </div>

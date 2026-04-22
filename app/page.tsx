@@ -15,6 +15,8 @@ type Post = {
   content_url: string | null
   likes_count: number
   created_at: string
+  user_liked?: boolean
+  user_bookmarked?: boolean
   users: { id: string; username: string; avatar_url: string | null }
   restaurants: { id: string; name: string; city: string; michelin_stars: number; green_stars: boolean }
 }
@@ -47,11 +49,6 @@ export default function FeedPage() {
     : filter === -1
       ? posts.filter(p => p.restaurants?.green_stars)
       : posts.filter(p => p.restaurants?.michelin_stars === filter)
-
-  const handleLike = useCallback(async (postId: string) => {
-    if (!session) { setShowAuthGate(true); return }
-    await fetch(`/api/feed/posts/${postId}/like`, { method: 'POST' })
-  }, [session])
 
   // Track active card for video play/pause
   useEffect(() => {
@@ -158,7 +155,6 @@ export default function FeedPage() {
                 post={post}
                 isActive={i === activeIndex}
                 muted={muted}
-                onLike={handleLike}
                 onAuthRequired={() => setShowAuthGate(true)}
                 sessionUserId={session?.user?.id}
               />

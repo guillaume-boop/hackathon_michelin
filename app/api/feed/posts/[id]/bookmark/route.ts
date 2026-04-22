@@ -27,15 +27,15 @@ export async function POST(_req: Request, { params }: Params) {
     .from('feed_bookmarks')
     .insert({ post_id: params.id, user_id: me.id })
 
-  if (error && error.code !== '23505') return apiError(ServerError(error.message))
-  return new NextResponse(null, { status: 204 })
-}
+  if (error) return apiError(ServerError(error.message))
+    return new NextResponse(null, { status: 204 })
+  }
 
 export async function DELETE(_req: Request, { params }: Params) {
   const me = await getCurrentUser()
   if (!me) return apiError(UnauthorizedError())
 
-  await supabaseAdmin
+  const { error } = await supabaseAdmin
     .from('feed_bookmarks')
     .delete()
     .eq('post_id', params.id)
