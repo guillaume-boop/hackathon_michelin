@@ -4,17 +4,7 @@ import type React from 'react'
 
 const MAX_SCORE = 300
 
-const LEVELS = [
-  { min: 200, label: 'Grand Gourmet' },
-  { min: 100, label: 'Gourmet' },
-  { min: 50,  label: 'Gastronome' },
-  { min: 20,  label: 'Amateur éclairé' },
-  { min: 0,   label: 'Curieux' },
-]
 
-function getLevel(score: number) {
-  return LEVELS.find(l => score >= l.min)?.label ?? 'Curieux'
-}
 
 // Étincelles réparties le long de la barre : left% + délai
 const SPARKS = [
@@ -28,7 +18,6 @@ const SPARKS = [
 ]
 
 export default function CircleScore({ score }: { score: number }) {
-  const level = getLevel(score)
   // Plus le score est élevé, plus le shimmer va vite (3.5s → 0.5s)
   const shimmerDuration = Math.max(0.5, 3.5 - (Math.min(score, MAX_SCORE) / MAX_SCORE) * 3).toFixed(2) + 's'
 

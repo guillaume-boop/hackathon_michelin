@@ -19,8 +19,8 @@ export async function GET(_req: Request, { params }: Params) {
   if (feedRes.error) return apiError(ServerError(feedRes.error.message))
   if (expRes.error) return apiError(ServerError(expRes.error.message))
 
-  const feedItems = (feedRes.data ?? []).map((row: any) => ({ type: 'feed', ...row.feed_posts }))
-  const expItems = (expRes.data ?? []).map((row: any) => ({ type: 'experience', ...row.experiences }))
+  const feedItems = (feedRes.data ?? []).map((row: Record<string, unknown>) => ({ type: 'feed', ...(row.feed_posts as object) }))
+  const expItems = (expRes.data ?? []).map((row: Record<string, unknown>) => ({ type: 'experience', ...(row.experiences as object) }))
 
   return NextResponse.json([...feedItems, ...expItems])
 }
