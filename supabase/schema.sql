@@ -55,6 +55,14 @@ create table if not exists feed_likes (
   primary key (post_id, user_id)
 );
 
+-- Feed bookmarks
+create table if not exists feed_bookmarks (
+  post_id   uuid not null references feed_posts(id) on delete cascade,
+  user_id   uuid not null references users(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  primary key (post_id, user_id)
+);
+
 -- Follows
 create table if not exists follows (
   follower_id uuid not null references users(id) on delete cascade,

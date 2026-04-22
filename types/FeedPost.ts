@@ -8,4 +8,6 @@ export interface FeedPost {
   content_url: string | null
   likes_count: number
   created_at: string
+  user_liked?: boolean
+  user_bookmarked?: boolean
 }
