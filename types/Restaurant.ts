@@ -12,5 +12,6 @@ export interface Restaurant {
   country: string
   lat: number
   lng: number
+  description?: string
   created_at: string
 }

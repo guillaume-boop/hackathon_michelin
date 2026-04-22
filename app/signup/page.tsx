@@ -5,6 +5,8 @@ import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
+const inputClass = 'w-full px-4 py-3.5 rounded-2xl text-white placeholder-white/30 border border-white/10 focus:border-white/30 focus:outline-none text-sm transition-colors bg-white/5'
+
 export default function SignupPage() {
   const router = useRouter()
   const [username, setUsername] = useState('')
@@ -18,7 +20,6 @@ export default function SignupPage() {
     setError(null)
     setLoading(true)
 
-    // 1. Créer le compte via notre API
     const res = await fetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -32,15 +33,9 @@ export default function SignupPage() {
       return
     }
 
-    // 2. Connecter automatiquement
-    const signInRes = await signIn('credentials', {
-      email,
-      password,
-      redirect: false,
-    })
-
+    const signInRes = await signIn('credentials', { email, password, redirect: false })
     if (!signInRes?.ok) {
-      setError('Compte créé mais connexion impossible. Essaie de te connecter.')
+      setError('Compte créé. Tu peux maintenant te connecter.')
       setLoading(false)
       return
     }
@@ -50,61 +45,49 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-950 px-4">
+    <div className="min-h-dvh flex flex-col items-center justify-center bg-black px-6" style={{ background: 'radial-gradient(ellipse at top, rgba(228,0,43,0.12) 0%, #000 60%)' }}>
       <div className="w-full max-w-sm">
 
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-600 mb-4">
-            <span className="text-xl font-bold">M</span>
+        <div className="text-center mb-10">
+          <div
+            className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-5 shadow-lg shadow-red-900/40"
+            style={{ background: '#E4002B' }}
+          >
+            <span className="text-white font-bold text-2xl tracking-tight">M</span>
           </div>
-          <h1 className="text-xl font-semibold text-white">Créer un compte</h1>
+          <h1 className="text-2xl font-bold text-white mb-1">Rejoins le cercle</h1>
+          <p className="text-white/40 text-sm">Crée ton compte Michelin</p>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-          <input
-            type="text"
-            placeholder="Nom d'utilisateur"
-            value={username}
-            onChange={e => setUsername(e.target.value)}
-            required
-            minLength={3}
-            className="w-full px-4 py-3 rounded-xl bg-neutral-800 text-white placeholder-neutral-500 border border-neutral-700 focus:border-neutral-500 focus:outline-none text-sm"
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            required
-            className="w-full px-4 py-3 rounded-xl bg-neutral-800 text-white placeholder-neutral-500 border border-neutral-700 focus:border-neutral-500 focus:outline-none text-sm"
-          />
-          <input
-            type="password"
-            placeholder="Mot de passe (min. 6 caractères)"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            required
-            minLength={6}
-            className="w-full px-4 py-3 rounded-xl bg-neutral-800 text-white placeholder-neutral-500 border border-neutral-700 focus:border-neutral-500 focus:outline-none text-sm"
-          />
+          <input type="text" placeholder="Nom d'utilisateur" value={username} onChange={e => setUsername(e.target.value)} required minLength={3} className={inputClass} autoComplete="username" />
+          <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required className={inputClass} autoComplete="email" />
+          <input type="password" placeholder="Mot de passe (min. 6 caractères)" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} className={inputClass} autoComplete="new-password" />
 
-          {error && <p className="text-red-400 text-sm text-center">{error}</p>}
+          {error && (
+            <p className="text-red-400 text-sm text-center py-1">{error}</p>
+          )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl bg-white text-neutral-900 font-semibold hover:bg-neutral-200 transition-colors disabled:opacity-50 text-sm mt-1"
+            className="w-full py-3.5 rounded-2xl text-white font-semibold text-sm mt-1 disabled:opacity-50 transition-opacity active:opacity-80"
+            style={{ background: '#E4002B' }}
           >
             {loading ? 'Création…' : 'Créer mon compte'}
           </button>
         </form>
 
-        <p className="text-neutral-500 text-sm text-center mt-6">
+        <p className="text-white/30 text-sm text-center mt-6">
           Déjà un compte ?{' '}
           <Link href="/login" className="text-white hover:underline">
             Se connecter
           </Link>
         </p>
+
+        <Link href="/" className="block text-center text-white/20 text-xs mt-4 hover:text-white/40 transition-colors">
+          Continuer sans compte →
+        </Link>
       </div>
     </div>
   )

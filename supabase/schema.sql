@@ -21,6 +21,7 @@ create table if not exists restaurants (
   country text not null,
   lat double precision not null default 0,
   lng double precision not null default 0,
+  description text,
   created_at timestamptz not null default now()
 );
 

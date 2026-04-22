@@ -10,11 +10,9 @@ export default withAuth(
   },
   {
     callbacks: {
-      authorized({ token, req }) {
-        const { pathname } = req.nextUrl
-        if (pathname.startsWith('/login') || pathname.startsWith('/signup')) return true
-        if (pathname.startsWith('/api')) return true
-        return !!token
+      authorized() {
+        // All routes are public — auth gates are enforced client-side per action
+        return true
       },
     },
   }

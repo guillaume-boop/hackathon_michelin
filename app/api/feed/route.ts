@@ -12,7 +12,7 @@ export async function GET(request: Request) {
 
   let query = supabaseAdmin
     .from('feed_posts')
-    .select('*, users(id, username, avatar_url), restaurants(id, name, city, michelin_stars)')
+    .select('*, restaurants!feed_posts_restaurant_id_fkey(id, name, city, michelin_stars, green_stars, description)')
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1)
 

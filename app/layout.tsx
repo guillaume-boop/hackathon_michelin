@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import localFont from 'next/font/local'
 import Providers from './providers'
 import './globals.css'
@@ -8,21 +8,29 @@ const geistSans = localFont({
   variable: '--font-geist-sans',
   weight: '100 900',
 })
-const geistMono = localFont({
-  src: './fonts/GeistMonoVF.woff',
-  variable: '--font-geist-mono',
-  weight: '100 900',
-})
 
 export const metadata: Metadata = {
-  title: 'Michelin Social',
-  description: 'Découvrez, partagez, et vivez les meilleures expériences Michelin',
+  title: 'Michelin',
+  description: 'Vivez les meilleures expériences Michelin',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Michelin',
+  },
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-neutral-950 text-white`}>
+      <body className={`${geistSans.variable} font-[family-name:var(--font-geist-sans)] antialiased bg-black text-white`}>
         <Providers>{children}</Providers>
       </body>
     </html>
