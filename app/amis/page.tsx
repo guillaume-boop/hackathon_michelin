@@ -1,6 +1,8 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+export const dynamic = 'force-dynamic'
+
+import { useState, useEffect, useRef, useCallback, Suspense } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -30,6 +32,14 @@ type User = {
 
 
 export default function AmisPage() {
+  return (
+    <Suspense>
+      <AmisContent />
+    </Suspense>
+  )
+}
+
+function AmisContent() {
   const { data: session } = useSession()
   const router = useRouter()
   const searchParams = useSearchParams()
