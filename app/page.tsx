@@ -74,12 +74,6 @@ export default function FeedPage() {
     return () => observer.disconnect()
   }, [filteredPosts])
 
-  const getFilterLabel = () => {
-    if (filter === null) return 'Filtre'
-    if (filter === -1) return '🌿'
-    return `${filter}★`
-  }
-
   return (
     <div className="relative bg-black overflow-hidden" style={{ height: '100dvh' }}>
 
