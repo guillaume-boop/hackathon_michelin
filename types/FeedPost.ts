@@ -11,3 +11,14 @@ export interface FeedPost {
   user_liked?: boolean
   user_bookmarked?: boolean
 }
+
+export type FeedPostWithRestaurant = FeedPost & {
+  restaurants: {
+    id: string
+    name: string
+    city: string
+    michelin_stars: number
+    green_stars?: boolean
+    description?: string
+  }
+}
