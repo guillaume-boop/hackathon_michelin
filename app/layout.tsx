@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from 'next'
 import localFont from 'next/font/local'
 import Providers from './providers'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import './globals.css'
 
 const geistSans = localFont({
@@ -10,12 +12,12 @@ const geistSans = localFont({
 })
 
 export const metadata: Metadata = {
-  title: 'Michelin',
-  description: 'Vivez les meilleures expériences Michelin',
+  title: 'FoodTok - Expériences culinaires',
+  description: 'Découvrez et partagez les meilleures expériences gastronomiques',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Michelin',
+    title: 'FoodTok',
   },
 }
 
@@ -29,9 +31,33 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr">
-      <body className={`${geistSans.variable} font-[family-name:var(--font-geist-sans)] antialiased bg-black text-white`}>
-        <Providers>{children}</Providers>
+    <html lang="fr" suppressHydrationWarning>
+      <body className={`${geistSans.variable} font-[family-name:var(--font-geist-sans)] antialiased bg-white dark:bg-black text-gray-900 dark:text-white transition-colors`}>
+        <Providers>
+          {children}
+          
+          {/* Toast Container pour les notifications */}
+          <ToastContainer
+            position="top-center"
+            autoClose={3000}
+            hideProgressBar={true}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="colored"
+            style={{
+              borderRadius: '5px',
+            }}
+            toastStyle={{
+              borderRadius: '12px',
+              fontFamily: 'var(--font-geist-sans)',
+              fontSize: '14px',
+            }}
+          />
+        </Providers>
       </body>
     </html>
   )
