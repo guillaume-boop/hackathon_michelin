@@ -23,14 +23,20 @@ export default async function RestaurantPage({ params }: { params: { id: string 
 
   if (!restaurant) notFound()
 
-  // filter dishes belonging to this restaurant's chefs
-  const chefIds = new Set((chefs ?? []).map((c) => c.id))
+  // Supabase returns users as array on joins — normalize to single object
+  const normalizedChefs = (chefs ?? []).map((c) => ({
+    id: c.id,
+    bio: c.bio,
+    users: Array.isArray(c.users) ? c.users[0] ?? null : c.users,
+  }))
+
+  const chefIds = new Set(normalizedChefs.map((c) => c.id))
   const menuDishes = (dishes ?? []).filter((d) => chefIds.has(d.chef_profile_id))
 
   return (
     <RestaurantPageClient
       restaurant={restaurant}
-      chefs={chefs ?? []}
+      chefs={normalizedChefs}
       posts={posts ?? []}
       menuDishes={menuDishes}
     />
