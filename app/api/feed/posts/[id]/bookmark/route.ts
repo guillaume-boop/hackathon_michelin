@@ -35,7 +35,7 @@ export async function DELETE(_req: Request, { params }: Params) {
   const me = await getCurrentUser()
   if (!me) return apiError(UnauthorizedError())
 
-  const { error } = await supabaseAdmin
+  await supabaseAdmin
     .from('feed_bookmarks')
     .delete()
     .eq('post_id', params.id)
