@@ -3,21 +3,10 @@
 import { useRef, useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
 import Stars from '@/components/ui/Stars'
-
-type Post = {
-  id: string
-  restaurant_id: string
-  type: string
-  content_url: string | null
-  likes_count: number
-  created_at: string
-  user_liked?: boolean
-  user_bookmarked?: boolean
-  restaurants: { id: string; name: string; city: string; michelin_stars: number; green_stars?: boolean; description?: string }
-}
+import type { FeedPostWithRestaurant } from '@/types/FeedPost'
 
 interface VideoCardProps {
-  post: Post
+  post: FeedPostWithRestaurant
   isActive: boolean
   muted: boolean
   onAuthRequired: () => void
@@ -193,8 +182,6 @@ export default function VideoCard({ post, isActive, muted, onAuthRequired, sessi
           <span className="text-white text-xs font-bold">{post.restaurants?.name}</span>
           <span className="text-white/30 text-xs">·</span>
           <span className="text-white/60 text-xs">{post.restaurants?.city}</span>
-          <span className="text-white/30 text-xs">·</span>
-          <span className="text-white/60 text-xs">1.2km</span>
         </div>
 
         {/* en savoir + */}

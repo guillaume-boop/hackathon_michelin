@@ -6,24 +6,11 @@ import Link from 'next/link'
 import VideoCard from '@/components/feed/VideoCard'
 import BottomNav from '@/components/layout/BottomNav'
 import AuthGateModal from '@/components/ui/AuthGateModal'
-
-type Post = {
-  id: string
-  user_id: string
-  restaurant_id: string
-  type: string
-  content_url: string | null
-  likes_count: number
-  created_at: string
-  user_liked?: boolean
-  user_bookmarked?: boolean
-  users: { id: string; username: string; avatar_url: string | null }
-  restaurants: { id: string; name: string; city: string; michelin_stars: number; green_stars: boolean }
-}
+import type { FeedPostWithRestaurant } from '@/types/FeedPost'
 
 export default function FeedPage() {
   const { data: session } = useSession()
-  const [posts, setPosts] = useState<Post[]>([])
+  const [posts, setPosts] = useState<FeedPostWithRestaurant[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<number | null>(null)
   const [activeIndex, setActiveIndex] = useState(0)
