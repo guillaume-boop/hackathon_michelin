@@ -180,7 +180,7 @@ export default function DecouvrirPage() {
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 placeholder="Restaurant, chef, ville…"
-                className={`flex-1 bg-transparent text-sm outline-none ${isLight ? 'text-[#262626] placeholder:text-black/30' : 'text-white placeholder:text-white/30'}`}
+                className={`flex-1 bg-transparent text-sm outline-none h-6 ${isLight ? 'text-[#262626] placeholder:text-black/30' : 'text-white placeholder:text-white/30'}`}
               />
               {query && (
                 <button onClick={() => setQuery('')} className="opacity-40 active:opacity-100">
