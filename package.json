@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "seed": "npx tsx scripts/seed.ts"
+    "seed": "npx tsx scripts/seed.ts",
+    "migrate:csv": "npx tsx scripts/migrate-csv-columns.ts",
+    "import:csv": "npx tsx scripts/import-csv.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.2",
