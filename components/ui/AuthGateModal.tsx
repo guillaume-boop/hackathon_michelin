@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import Image from 'next/image'
+import { useEffect, useState, useCallback } from 'react'
 
 interface AuthGateModalProps {
   onClose: () => void
@@ -14,6 +15,11 @@ export default function AuthGateModal({
 }: AuthGateModalProps) {
   const [isVisible, setIsVisible] = useState(false)
 
+  const handleClose = useCallback(() => {
+    setIsVisible(false)
+    setTimeout(onClose, 300) // Attendre la fin de l'animation
+  }, [onClose])
+
   useEffect(() => {
     // Animation d'entrée
     setIsVisible(true)
@@ -23,12 +29,7 @@ export default function AuthGateModal({
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
-  }, [onClose])
-
-  const handleClose = () => {
-    setIsVisible(false)
-    setTimeout(onClose, 300) // Attendre la fin de l'animation
-  }
+  }, [handleClose])
 
   return (
     <div
@@ -45,7 +46,7 @@ export default function AuthGateModal({
         }`}
         onClick={e => e.stopPropagation()}
       >
-        <div className="rounded-2xl p-6 bg-white dark:bg-[#111] shadow-2xl  dark:border-white/10">
+        <div className="relative rounded-2xl p-6 bg-white dark:bg-[#111] shadow-2xl border border-gray-200 dark:border-white/10">
           
           {/* Bouton fermeture en haut à droite */}
           <button
@@ -57,34 +58,36 @@ export default function AuthGateModal({
             </svg>
           </button>
 
-          {/* Logo */}
-            <div className="flex justify-center mb-5">
-            <div className="bg-gray-200 h-18 w-18 rounded-xl p-3">
-              <img 
-              src="/icons/etoile-michelin.svg" 
-              alt="Michelin" 
-              className="w-14 h-14"
+          {/* Logo - avec Image de next/image */}
+          <div className="flex justify-center mb-5">
+            <div className="bg-gray-100 dark:bg-gray-800 h-18 w-18 rounded-xl p-3">
+              <Image 
+                src="/icons/etoile-michelin.svg" 
+                alt="Michelin" 
+                width={56}
+                height={56}
+                className="w-14 h-14"
               />
             </div>
-            </div>
+          </div>
 
           <h2 className="text-xl font-bold text-gray-900 dark:text-white text-center mb-2">
             {message}
           </h2>
           <p className="text-gray-500 dark:text-white/50 text-sm text-center mb-7 leading-relaxed">
-           Rejoins la communauté Michelin pour liker, partager et sauvegarder tes expériences.
+            Rejoins la communauté Michelin pour liker, partager et sauvegarder tes expériences.
           </p>
 
           <div className="flex flex-col gap-3">
             <Link
               href="/login"
-              className="w-full py-3.5 rounded-xl text-white font-semibold text-center text-sm transition-all hover:bg-michelin-red/80 bg-michelin-red"
+              className="w-full py-3.5 rounded-xl text-white font-semibold text-center text-sm transition-all hover:bg-[#c40026] bg-[#E4002B]"
             >
               Se connecter
             </Link>
             <Link
               href="/signup"
-              className="w-full py-3.5 rounded-xl text-gray-700 dark:text-white font-semibold text-center text-sm  dark:border-white/10 transition-all hover:bg-gray-50 dark:hover:bg-white/20  bg-michelin-gold dark:bg-white/10"
+              className="w-full py-3.5 rounded-xl text-gray-700 dark:text-white font-semibold text-center text-sm border border-gray-200 dark:border-white/10 transition-all hover:bg-gray-50 dark:hover:bg-white/5 bg-amber-50 dark:bg-white/5"
             >
               Créer un compte
             </Link>
