@@ -5,19 +5,17 @@ interface StarsProps {
   variant?: 'inline' | 'overlay'
 }
 
-function StarSVG({ size = 18, color = '#E4002B' }: { size?: number; color?: string }) {
+function StarIcon({ size = 18, isGreen = false }: { size?: number; isGreen?: boolean }) {
+  const filterColor = isGreen ? 'brightness(0) saturate(100%) invert(40%) sepia(80%) saturate(600%) hue-rotate(100deg) brightness(70%) contrast(110%)' : 'none'
   return (
-    <svg viewBox="0 0 24 24" width={size} height={size} fill={color} style={{ flexShrink: 0 }}>
-      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-    </svg>
-  )
-}
-
-function GreenStarSVG({ size = 18 }: { size?: number }) {
-  return (
-    <svg viewBox="0 0 24 24" width={size} height={size} fill="#22c55e" style={{ flexShrink: 0 }}>
-      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-    </svg>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="/icons/etoile-michelin.svg"
+      alt="★"
+      width={size}
+      height={size}
+      style={{ flexShrink: 0, filter: filterColor }}
+    />
   )
 }
 
@@ -33,12 +31,12 @@ export default function Stars({ count, green = false, size = 'sm', variant = 'in
       <div className={`flex items-center ${gap}`}>
         {Array.from({ length: count }).map((_, i) => (
           <div key={`red-${i}`} style={{ filter: 'drop-shadow(0 1px 0px #000) drop-shadow(0 2px 6px rgba(0,0,0,0.9)) drop-shadow(0 0 12px rgba(0,0,0,0.7))' }}>
-            <StarSVG size={dimSize} />
+            <StarIcon size={dimSize} />
           </div>
         ))}
         {green && (
           <div style={{ filter: 'drop-shadow(0 1px 0px #000) drop-shadow(0 2px 6px rgba(0,0,0,0.9)) drop-shadow(0 0 12px rgba(0,0,0,0.7))' }}>
-            <GreenStarSVG size={dimSize} />
+            <StarIcon size={dimSize} isGreen />
           </div>
         )}
       </div>
@@ -49,9 +47,9 @@ export default function Stars({ count, green = false, size = 'sm', variant = 'in
   return (
     <span className={`inline-flex items-center ${gap}`}>
       {Array.from({ length: count }).map((_, i) => (
-        <StarSVG key={`in-${i}`} size={dimSize} />
+        <StarIcon key={`in-${i}`} size={dimSize} />
       ))}
-      {green && <GreenStarSVG size={dimSize} />}
+      {green && <StarIcon size={dimSize} isGreen />}
     </span>
   )
 }
