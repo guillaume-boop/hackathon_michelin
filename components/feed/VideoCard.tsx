@@ -124,7 +124,6 @@ export default function VideoCard({ post, isActive, muted, onAuthRequired, sessi
           muted={muted}
           playsInline
           preload="metadata"
-          crossOrigin="anonymous"
           onCanPlay={() => setVideoReady(true)}
           onError={() => setVideoError(true)}
         />
