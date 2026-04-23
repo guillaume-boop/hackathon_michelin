@@ -45,20 +45,22 @@ const SESSION_KEY = 'decouvrir_query'
 export default function DecouvrirPage() {
   const { data: session } = useSession()
   const inputRef = useRef<HTMLInputElement>(null)
-  const [isLight, setIsLight] = useState(false)
-  const [query, setQuery] = useState(() => {
-    if (typeof window !== 'undefined') return sessionStorage.getItem(SESSION_KEY) ?? ''
-    return ''
-  })
+  const [isLight, setIsLight] = useState(true)
+  const [query, setQuery] = useState('')
   const [restaurants, setRestaurants] = useState<Restaurant[]>([])
   const [users, setUsers] = useState<User[]>([])
   const [followingIds, setFollowingIds] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(false)
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS)
   const [pendingFilters, setPendingFilters] = useState<Filters>(DEFAULT_FILTERS)
+  const [mounted, setMounted] = useState(false)
 
-  // Restore filters and restaurants from sessionStorage on mount
+  // Restore query, filters and restaurants from sessionStorage on mount
   useEffect(() => {
+    setMounted(true)
+    const savedQuery = sessionStorage.getItem(SESSION_KEY)
+    if (savedQuery) setQuery(savedQuery)
+
     const savedFilters = sessionStorage.getItem(FILTERS_STORAGE_KEY)
     const savedResults = sessionStorage.getItem(RESULTS_STORAGE_KEY)
     if (savedFilters && savedResults) {
