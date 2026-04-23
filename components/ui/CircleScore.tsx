@@ -4,21 +4,17 @@ import type React from 'react'
 
 const MAX_SCORE = 300
 
-
-
-// Étincelles réparties le long de la barre : left% + délai
 const SPARKS = [
-  { left: '15%', delay: '0s',    size: 7,  color: '#E4002B' },
-  { left: '28%', delay: '0.4s',  size: 6,  color: 'white'   },
-  { left: '42%', delay: '0.9s',  size: 8,  color: '#ff6b6b' },
-  { left: '57%', delay: '0.2s',  size: 6,  color: '#E4002B' },
-  { left: '70%', delay: '0.65s', size: 7,  color: 'white'   },
-  { left: '83%', delay: '1.1s',  size: 5,  color: '#ff6b6b' },
-  { left: '91%', delay: '0.35s', size: 8,  color: '#E4002B' },
+  { left: '12%', delay: '0s',    size: 8,  color: 'white'   },
+  { left: '25%', delay: '0.5s',  size: 6,  color: '#ffb3d9' },
+  { left: '38%', delay: '1.0s',  size: 9,  color: 'white'   },
+  { left: '52%', delay: '0.25s', size: 7,  color: '#ffb3d9' },
+  { left: '65%', delay: '0.75s', size: 8,  color: 'white'   },
+  { left: '78%', delay: '0.4s',  size: 6,  color: '#ffb3d9' },
+  { left: '88%', delay: '1.2s',  size: 9,  color: 'white'   },
 ]
 
 export default function CircleScore({ score }: { score: number }) {
-  // Plus le score est élevé, plus le shimmer va vite (3.5s → 0.5s)
   const shimmerDuration = Math.max(0.5, 3.5 - (Math.min(score, MAX_SCORE) / MAX_SCORE) * 3).toFixed(2) + 's'
 
   return (
@@ -33,36 +29,31 @@ export default function CircleScore({ score }: { score: number }) {
           to   { transform: rotate(360deg); }
         }
         @keyframes spark-rise {
-          0%   { opacity: 0; transform: translateX(-50%) translateY(-50%) scale(0); }
-          20%  { opacity: 1; transform: translateX(-50%) translateY(calc(-50% - 6px)) scale(1); }
-          70%  { opacity: 1; transform: translateX(-50%) translateY(calc(-50% - 14px)) scale(0.8); }
-          100% { opacity: 0; transform: translateX(-50%) translateY(calc(-50% - 20px)) scale(0); }
+          0%   { opacity: 0;   transform: translateX(-50%) translateY(0px)   scale(0.4); }
+          25%  { opacity: 1;   transform: translateX(-50%) translateY(-10px)  scale(1);   }
+          75%  { opacity: 0.8; transform: translateX(-50%) translateY(-22px)  scale(0.8); }
+          100% { opacity: 0;   transform: translateX(-50%) translateY(-32px)  scale(0.3); }
         }
         .bar-shimmer { animation: bar-shimmer var(--shimmer-duration, 1.8s) linear infinite; }
         .icon-spin   { animation: icon-spin 2.4s linear infinite; }
-        .spark       { animation: spark-rise 1.4s ease-in-out infinite; }
+        .cs-spark    { animation: spark-rise 1.6s ease-out infinite; position: absolute; pointer-events: none; line-height: 1; }
       `}</style>
 
-      {/* Label au-dessus */}
-      <div className="mb-2 px-0.5">
-        <span className="text-white font-bold text-sm">Votre score :</span>
-      </div>
+      {/* Conteneur avec espace au-dessus pour les étincelles */}
+      <div style={{ position: 'relative' }}>
 
-      {/* Barre complète avec icône dedans */}
-      <div className="relative">
-
-        {/* Étincelles au-dessus */}
+        {/* Étincelles positionnées au bord supérieur de la barre */}
         {SPARKS.map((sp, i) => (
           <span
             key={i}
-            className="spark absolute pointer-events-none z-10"
+            className="cs-spark"
             style={{
               left: sp.left,
-              top: '50%',
+              bottom: 0,
               fontSize: sp.size,
               color: sp.color,
               animationDelay: sp.delay,
-              lineHeight: 1,
+              zIndex: 10,
             }}
           >
             ✦
@@ -70,33 +61,38 @@ export default function CircleScore({ score }: { score: number }) {
         ))}
 
         {/* Barre dégradée */}
-        <div className="h-8 rounded-2xl bg-white/[0.06] overflow-hidden relative">
+        <div style={{ position: 'relative', height: 48, borderRadius: 999, overflow: 'hidden', marginLeft: 8, marginRight: 8 }}>
           <div
-            className="absolute inset-0"
-            style={{ background: 'linear-gradient(90deg, rgba(228,0,43,0.1) 0%, rgba(228,0,43,0.5) 60%, #E4002B 100%)' }}
+            style={{
+              position: 'absolute', inset: 0,
+              background: 'linear-gradient(90deg, #D30792 0%, #D3072C 100%)',
+            }}
           />
           <div
-            className="bar-shimmer absolute inset-y-0 w-1/4"
-            style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent)' }}
+            className="bar-shimmer"
+            style={{
+              position: 'absolute', top: 0, bottom: 0, width: '25%',
+              background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+            }}
           />
-        </div>
 
-        {/* Score à droite dans la barre, avant l'icône */}
-        <div className="absolute right-9 top-1/2 -translate-y-1/2 z-20">
-          <span className="text-white font-black text-sm leading-none tabular-nums">{score}</span>
-        </div>
+          {/* Label à gauche */}
+          <div style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', zIndex: 2 }}>
+            <span style={{ color: 'white', fontWeight: 700, fontSize: 14, lineHeight: 1 }}>Score total :</span>
+          </div>
 
-        {/* Icône à droite dans la barre */}
-        <div className="absolute right-1 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center z-20">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/icons/etoile-michelin.svg"
-            alt=""
-            className="icon-spin w-6 h-6"
-            style={{ filter: 'brightness(0) invert(1) drop-shadow(0 0 4px rgba(255,255,255,0.6))' }}
-          />
+          {/* Score + icône à droite */}
+          <div style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', zIndex: 2, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ color: 'white', fontWeight: 900, fontSize: 14, lineHeight: 1 }}>{score}</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/icons/etoile-michelin.svg"
+              alt=""
+              className="icon-spin"
+              style={{ width: 24, height: 24, filter: 'brightness(0) invert(1) drop-shadow(0 0 4px rgba(255,255,255,0.6))' }}
+            />
+          </div>
         </div>
-
       </div>
     </div>
   )

@@ -192,7 +192,7 @@ export default function SearchPage() {
                 return (
                   <Link
                     key={u.id}
-                    href={`/chef/${u.id}`}
+                    href={`/user/${u.id}`}
                     className="flex items-center gap-3 p-3 rounded-2xl bg-neutral-900 border border-white/5 active:bg-neutral-800 transition-colors"
                   >
                     <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 bg-neutral-700">
