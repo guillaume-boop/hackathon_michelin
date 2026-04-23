@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
+import { useSession } from 'next-auth/react'
 import Stars from '@/components/ui/Stars'
 
 type Restaurant = {
@@ -78,6 +80,7 @@ export default function RestaurantPageClient({ restaurant, chefs, posts, menuDis
   posts: Post[]
   menuDishes: Dish[]
 }) {
+  const { data: session } = useSession()
   const router = useRouter()
   const [liked, setLiked] = useState(false)
   const [openVideo, setOpenVideo] = useState<string | null>(null)
@@ -212,8 +215,6 @@ export default function RestaurantPageClient({ restaurant, chefs, posts, menuDis
                 )
               })}
             </div>
-          </div>
-        )}
 
         {/* ── Menu carousel ──────────────────────── */}
         <div className="mt-8">
@@ -234,10 +235,13 @@ export default function RestaurantPageClient({ restaurant, chefs, posts, menuDis
                     )}
                   </div>
                 </div>
-              )
-            })}
-          </div>
-        </div>
+              )}
+              <h1 className="text-3xl font-black tracking-tight leading-tight uppercase text-gray-900 dark:text-white">{restaurant.name}</h1>
+              <p className="text-gray-500 dark:text-white/50 text-xs mt-1.5 mb-3">{cuisine}</p>
+              {restaurant.description && (
+                <p className="text-gray-600 dark:text-white/60 text-sm leading-relaxed max-w-xs mx-auto">{restaurant.description}</p>
+              )}
+            </div>
 
         {/* ── Infos pratiques ────────────────────── */}
         <div className="mx-4 mt-6 grid grid-cols-4 gap-2">
@@ -246,8 +250,6 @@ export default function RestaurantPageClient({ restaurant, chefs, posts, menuDis
               <span className="text-xl">{icon}</span>
               <span className={`text-[10px] text-center leading-tight font-normal whitespace-pre-line ${sub}`}>{label}</span>
             </div>
-          ))}
-        </div>
 
         {/* ── Feed vidéos ───────────────────────── */}
         {videos.length > 0 && (
@@ -267,10 +269,58 @@ export default function RestaurantPageClient({ restaurant, chefs, posts, menuDis
                         <path d="M6.3 2.841A1.5 1.5 0 0 0 4 4.11V15.89a1.5 1.5 0 0 0 2.3 1.269l9.344-5.89a1.5 1.5 0 0 0 0-2.538L6.3 2.84Z" />
                       </svg>
                     </div>
-                  </div>
-                </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* ── Infos pratiques ── */}
+            <div className="mx-4 mt-6 grid grid-cols-4 gap-2">
+              {MOCK_PRACTICAL.map(({ icon, label }) => (
+                <div key={label} className="flex flex-col items-center gap-1.5 py-3 px-1 rounded-xl bg-gray-100 dark:bg-neutral-900 border border-gray-200 dark:border-white/5">
+                  <span className="text-xl">{icon}</span>
+                  <span className="text-gray-500 dark:text-white/40 text-[9px] text-center leading-tight font-medium whitespace-pre-line">{label}</span>
+                </div>
               ))}
             </div>
+
+            {/* ── Feed vidéos carousel ── */}
+            {videos.length > 0 && (
+              <div className="mt-8 mb-4">
+                <p className="text-gray-900 dark:text-white font-black text-sm px-4 mb-3">Vidéos</p>
+                <div className="flex gap-3 overflow-x-auto px-4 pb-2">
+                  {videos.map((p) => (
+                    <button
+                      key={p.id}
+                      onClick={() => setOpenVideo(p.content_url!)}
+                      className="relative flex-shrink-0 w-32 h-48 rounded-2xl overflow-hidden bg-gray-200 dark:bg-neutral-900"
+                    >
+                      <video src={p.content_url!} className="w-full h-full object-cover" muted playsInline />
+                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                          <svg viewBox="0 0 24 24" fill="white" className="w-4 h-4 ml-0.5">
+                            <path d="M6.3 2.841A1.5 1.5 0 0 0 4 4.11V15.89a1.5 1.5 0 0 0 2.3 1.269l9.344-5.89a1.5 1.5 0 0 0 0-2.538L6.3 2.84Z" />
+                          </svg>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+          </div>
+        </main>
+
+        {/* ── Sticky CTA ── */}
+        <div className="fixed bottom-0 left-0 right-0 z-30 px-4 pb-10 pt-4 bg-gradient-to-t from-white dark:from-neutral-950 to-transparent lg:left-[208px] xl:left-[240px] 2xl:left-[288px]">
+          <div className="max-w-4xl mx-auto">
+            <button
+              className="w-full py-4 rounded-2xl font-black text-white text-sm tracking-widest uppercase active:scale-[0.98] transition-transform"
+              style={{ background: '#E4002B' }}
+            >
+              Réserver
+            </button>
           </div>
         )}
 
@@ -285,6 +335,11 @@ export default function RestaurantPageClient({ restaurant, chefs, posts, menuDis
         </div>
 
       </div>
+
+      {/* <div className='lg:hidden sm:hidden fixed bottom-0 left-0 right-0 z-30 bg-white/80 dark:bg-black/80 backdrop-blur-sm border-t border-gray-200 dark:border-gray-800'>
+      <BottomNav />
+     
+      </div>     */}
     </>
   )
 }
