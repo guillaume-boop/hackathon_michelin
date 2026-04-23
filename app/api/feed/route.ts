@@ -8,15 +8,16 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const onlyFollowing = searchParams.get('following') === 'true'
   const limit = parseInt(searchParams.get('limit') ?? '20', 10)
-  const offset = parseInt(searchParams.get('offset') ?? '0', 10)
+  const _offset = searchParams.get('offset')
+
+  // If no offset provided, use random offset
+  let offset = _offset ? parseInt(_offset, 10) : undefined
 
   const me = await getCurrentUser()
 
   let query = supabaseAdmin
     .from('feed_posts')
     .select('*, restaurants!feed_posts_restaurant_id_fkey(id, name, city, michelin_stars, green_stars, description)')
-    .order('created_at', { ascending: false })
-    .range(offset, offset + limit - 1)
 
   if (onlyFollowing && me) {
     const { data: follows } = await supabaseAdmin
@@ -29,6 +30,21 @@ export async function GET(request: Request) {
       query = query.in('user_id', ids)
     }
   }
+
+  // If offset is not provided, get random posts by fetching with random seed
+  if (offset === undefined) {
+    // Get total count of posts
+    const { count, error: countError } = await supabaseAdmin
+      .from('feed_posts')
+      .select('*', { count: 'exact', head: true })
+
+    if (countError) return apiError(ServerError(countError.message))
+
+    const total = count ?? 0
+    offset = total > limit ? Math.floor(Math.random() * (total - limit)) : 0
+  }
+
+  query = query.order('created_at', { ascending: false }).range(offset, offset + limit - 1)
 
   const { data, error } = await query
   if (error) return apiError(ServerError(error.message))
