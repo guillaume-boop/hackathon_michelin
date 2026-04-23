@@ -20,6 +20,7 @@ export default function FeedPage() {
   const [showFilterPanel, setShowFilterPanel] = useState(false)
   const [muted, setMuted] = useState(true)
   const [viewMode, setViewMode] = useState<'single' | 'grid'>('single')
+  const [videoReadyMap, setVideoReadyMap] = useState<Map<number, boolean>>(new Map())
   const containerRef = useRef<HTMLDivElement>(null)
   const gridCacheRef = useRef<HTMLDivElement>(null)
   const loaderRef = useRef<HTMLDivElement>(null) // Ref pour le loader observable
@@ -34,7 +35,7 @@ export default function FeedPage() {
   const BATCH_SIZE = 5
   const GRID_ITEMS_TO_DISPLAY = 20 // Display 20 items in grid before needing to scroll for more
   const LOAD_DELAY = 200 // Small delay to avoid blocking infinite scroll but still fast
-  const MIN_SCROLL_INTERVAL = 800 // Scroll lock (0.8 seconds between videos)
+  const MIN_SCROLL_INTERVAL = 0 // No scroll throttle — change immediately
 
   const fetchPostAtIndex = useCallback(async (idx: number) => {
     // Don't fetch if already fetched or currently fetching
@@ -152,11 +153,9 @@ export default function FeedPage() {
       const pendingAbortControllers = pendingAbortControllersRef.current
       
       const handleWheel = (e: WheelEvent) => {
-        const now = Date.now()
-        const timeSinceLastChange = now - lastActiveChangedTime
-        
-        // Block scroll if user hasn't waited MIN_SCROLL_INTERVAL
-        if (timeSinceLastChange < MIN_SCROLL_INTERVAL) {
+        // Block scroll only if current video is still loading
+        const currentVideoReady = videoReadyMap.get(activeIndex) ?? false
+        if (!currentVideoReady) {
           e.preventDefault()
         }
       }
@@ -582,17 +581,21 @@ export default function FeedPage() {
                   )}
                   
                   {/* Rendered posts (only visible window) */}
-                  {visiblePosts.filter(p => p !== null).map((post, i) => (
-                    <div key={post.id} className="feed-item snap-start" data-index={renderStart + i} style={{ height: '100dvh' }}>
+                  {visiblePosts.filter(p => p !== null).map((post, i) => {
+                    const idx = renderStart + i
+                    return (
+                    <div key={post.id} className="feed-item snap-start" data-index={idx} style={{ height: '100dvh' }}>
                       <VideoCard
                         post={post}
-                        isActive={renderStart + i === activeIndex}
+                        isActive={idx === activeIndex}
                         muted={muted}
                         onAuthRequired={() => setShowAuthGate(true)}
                         sessionUserId={session?.user?.id}
+                        onReadyChange={(ready) => setVideoReadyMap(m => new Map(m).set(idx, ready))}
                       />
                     </div>
-                  ))}
+                    )
+                  })}
                   
                   {/* Spacer after visible range */}
                   {renderEnd < filteredPosts.length && (
@@ -653,6 +656,7 @@ export default function FeedPage() {
                     muted={muted}
                     onAuthRequired={() => setShowAuthGate(true)}
                     sessionUserId={session?.user?.id}
+                    onReadyChange={() => {}}
                   />
                 </div>
               ))}

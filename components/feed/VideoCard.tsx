@@ -11,15 +11,20 @@ interface VideoCardProps {
   muted: boolean
   onAuthRequired: () => void
   sessionUserId?: string | null
+  onReadyChange?: (ready: boolean) => void
 }
 
-export default function VideoCard({ post, isActive, muted, onAuthRequired, sessionUserId }: VideoCardProps) {
+export default function VideoCard({ post, isActive, muted, onAuthRequired, sessionUserId, onReadyChange }: VideoCardProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [liked, setLiked] = useState(post.user_liked ?? false)
   const [likeCount, setLikeCount] = useState(post.likes_count)
   const [bookmarked, setBookmarked] = useState(post.user_bookmarked ?? false)
   const [videoError, setVideoError] = useState(false)
   const [videoReady, setVideoReady] = useState(false)
+
+  useEffect(() => {
+    onReadyChange?.(videoReady)
+  }, [videoReady, onReadyChange])
 
   useEffect(() => {
     const video = videoRef.current
