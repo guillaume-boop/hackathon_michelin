@@ -49,6 +49,7 @@ async function seedFeedPosts() {
       for (let i = 1; i <= 5; i++) {
         feedPosts.push({
           restaurant_id: restaurant.id,
+          type: 'video',
           content_url: `${FEED_BASE_URL}/feed${i}.mov`,
           likes_count: Math.floor(Math.random() * 2000) + 50,
         })
