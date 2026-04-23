@@ -470,7 +470,7 @@ export default function FeedPage() {
         <input
           type="text"
           placeholder="Chercher..."
-          className="w-full pl-10 pr-4 py-2.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#E4002B] focus:bg-white dark:focus:bg-gray-800 transition-all placeholder:text-gray-500 dark:placeholder:text-gray-500"
+          className="w-full pl-10 pr-4 py-2 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#E4002B] focus:bg-white dark:focus:bg-gray-800 transition-all placeholder:text-gray-500 dark:placeholder:text-gray-500"
         />
       </div>
     </div>
