@@ -153,7 +153,7 @@ export default function DecouvrirPage() {
 
   const iconStroke = isLight ? '#262626' : 'white'
   const cardBg = isLight ? 'bg-white border-black/[0.07]' : 'bg-neutral-900 border-white/[0.06]'
-  const inputCls = 'w-full rounded-xl px-3 py-3 text-white text-xs placeholder:text-white/50 outline-none border-0'
+  const inputCls = `w-full rounded-xl px-3 py-3 text-xs outline-none border-0 ${isLight ? 'text-[#262626] placeholder:text-black/30' : 'text-white placeholder:text-white/50'}`
 
   return (
     <div className={`min-h-screen pb-28 ${isLight ? 'bg-[#F5F5F5] text-[#262626]' : 'bg-black text-white'}`}>
@@ -290,23 +290,23 @@ export default function DecouvrirPage() {
               </div>
 
               {/* Grille de filtres */}
-              <div className="grid grid-cols-2 gap-3 mb-4" style={{ gridAutoRows: 'calc((100dvh - 370px) / 2)' }}>
+              <div className="grid grid-cols-2 gap-3 mb-4" style={{ gridAutoRows: 'minmax(140px, auto)' }}>
 
             {/* Ville */}
-            <div className={`rounded-2xl p-5 border flex flex-col justify-between ${cardBg}`}>
+            <div className={`rounded-2xl p-3 border flex flex-col justify-between ${cardBg}`}>
               <p className={`text-xs font-semibold leading-tight ${isLight ? 'text-[#262626]/60' : 'text-white/60'}`}>Quelle ville ?</p>
-              <input type="text" value={pendingFilters.ville} onChange={e => setPendingFilters(f => ({ ...f, ville: e.target.value }))} placeholder="Paris, Tokyo…" className={inputCls} style={{ background: '#D3072C' }} />
+              <input type="text" value={pendingFilters.ville} onChange={e => setPendingFilters(f => ({ ...f, ville: e.target.value }))} placeholder="Paris, Tokyo…" className={inputCls} style={{ background: isLight ? '#f0f0f0' : '#2d2d2d' }} />
             </div>
 
             {/* Michelin Stars */}
-            <div className={`rounded-2xl p-5 border flex flex-col justify-between ${cardBg}`}>
+            <div className={`rounded-2xl p-3 border flex flex-col justify-between ${cardBg}`}>
               <p className={`text-xs font-semibold leading-tight ${isLight ? 'text-[#262626]/60' : 'text-white/60'}`}>Étoiles Michelin</p>
-              <div className="flex gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 {[0, 1, 2, 3].map(stars => (
                   <button
                     key={stars}
                     onClick={() => setPendingFilters(f => ({ ...f, michelin_stars: f.michelin_stars === stars ? null : stars }))}
-                    className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center ${
+                    className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center ${
                       pendingFilters.michelin_stars === stars
                         ? 'bg-[#E4002B]'
                         : isLight ? 'bg-black/5' : 'bg-white/10'
@@ -339,9 +339,9 @@ export default function DecouvrirPage() {
             </div>
 
             {/* Budget */}
-            <div className={`rounded-2xl p-5 border flex flex-col justify-between ${cardBg}`}>
+            <div className={`rounded-2xl p-3 border flex flex-col justify-between ${cardBg}`}>
               <p className={`text-xs font-semibold leading-tight ${isLight ? 'text-[#262626]/60' : 'text-white/60'}`}>Budget</p>
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-2">
                 <input
                   type="range"
                   min="0"
@@ -364,7 +364,7 @@ export default function DecouvrirPage() {
             </div>
 
             {/* Cuisine */}
-            <div className={`rounded-2xl p-5 border flex flex-col justify-between ${cardBg}`}>
+            <div className={`rounded-2xl p-3 border flex flex-col justify-between ${cardBg}`}>
               <p className={`text-xs font-semibold leading-tight ${isLight ? 'text-[#262626]/60' : 'text-white/60'}`}>Type de cuisine</p>
               <select
                 value={pendingFilters.cuisine}

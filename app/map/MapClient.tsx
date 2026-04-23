@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { useSession } from 'next-auth/react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import 'leaflet.markercluster'
@@ -31,10 +32,11 @@ function markerColor(stars: number, green: boolean) {
 }
 
 export default function MapClient({ restaurantId }: { restaurantId?: string }) {
+  const session = useSession()
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<L.Map | null>(null)
   const restaurantIdRef = useRef(restaurantId)
-  
+
   // Review modal state
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null)
@@ -95,14 +97,14 @@ export default function MapClient({ restaurantId }: { restaurantId?: string }) {
   }
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || [])
+    if (photos.length > 0) return
+    const files = Array.from(e.target.files || []).slice(0, 1)
     const newPhotos: Photo[] = files.map(file => ({
       file,
       preview: URL.createObjectURL(file),
       id: Math.random().toString(36).substr(2, 9)
     }))
     setPhotos(prev => [...prev, ...newPhotos])
-    // Reset input so the same file can be selected again
     e.target.value = ''
   }
 
@@ -127,7 +129,7 @@ export default function MapClient({ restaurantId }: { restaurantId?: string }) {
 
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
+      const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: 'environment' }
       })
       // ✅ FIX: store stream in ref, then open camera — useEffect will attach it
@@ -135,11 +137,11 @@ export default function MapClient({ restaurantId }: { restaurantId?: string }) {
       setIsCameraOpen(true)
     } catch (err) {
       console.error('Erreur d\'accès à la caméra:', err)
-      alert('Impossible d\'accéder à la caméra. Veuillez vérifier les permissions.')
     }
   }
 
   const capturePhoto = () => {
+    if (photos.length > 0) return
     const video = videoRef.current
     const canvas = canvasRef.current
     if (!video || !canvas) return
@@ -150,7 +152,7 @@ export default function MapClient({ restaurantId }: { restaurantId?: string }) {
     canvas.width = video.videoWidth
     canvas.height = video.videoHeight
     context.drawImage(video, 0, 0, canvas.width, canvas.height)
-    
+
     canvas.toBlob((blob) => {
       if (!blob) return
       const file = new File([blob], `photo_${Date.now()}.jpg`, { type: 'image/jpeg' })
@@ -160,7 +162,8 @@ export default function MapClient({ restaurantId }: { restaurantId?: string }) {
         preview,
         id: Math.random().toString(36).substr(2, 9)
       }
-      setPhotos(prev => [...prev, newPhoto])
+      setPhotos([newPhoto])
+      stopCamera()
     }, 'image/jpeg', 0.9)
   }
 
@@ -169,39 +172,36 @@ export default function MapClient({ restaurantId }: { restaurantId?: string }) {
   }
 
   const handleSubmitReview = async () => {
-    if (rating === 0) {
-      alert('Veuillez noter le restaurant')
-      return
-    }
-    if (!reviewText.trim()) {
-      alert('Veuillez écrire un avis')
+    if (rating === 0 || !reviewText.trim()) {
       return
     }
 
     setIsSubmitting(true)
-    
+
     const formData = new FormData()
     formData.append('restaurantId', selectedRestaurant!.id)
     formData.append('rating', rating.toString())
     formData.append('review', reviewText)
-    photos.forEach((photo, index) => {
-      formData.append(`photo_${index}`, photo.file)
+    formData.append('userId', session?.data?.user?.id || '')
+    photos.forEach((photo) => {
+      formData.append('photos', photo.file)
     })
-    
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      console.log('Review submitted:', {
-        restaurantId: selectedRestaurant?.id,
-        rating,
-        review: reviewText,
-        photos: photos.length
+      const response = await fetch('/api/map/events', {
+        method: 'POST',
+        body: formData
       })
-      alert(`Merci pour votre avis ! ${photos.length} photo${photos.length > 1 ? 's' : ''} ajoutée${photos.length > 1 ? 's' : ''}`)
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Upload failed')
+      }
+
       stopCamera()
       handleCloseModal()
     } catch (error) {
       console.error('Error submitting review:', error)
-      alert('Une erreur est survenue')
     } finally {
       setIsSubmitting(false)
     }
@@ -402,31 +402,54 @@ export default function MapClient({ restaurantId }: { restaurantId?: string }) {
                   <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', color: modalSubTextColor, marginBottom: '12px' }}>
                     Notez ce restaurant
                   </label>
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    {[1, 2, 3, 4, 5].map((star) => (
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <button
+                      onClick={() => setRating(0)}
+                      style={{
+                        background: 'none', border: 'none', cursor: 'pointer', padding: '4px',
+                        opacity: rating === 0 ? 1 : 0.3,
+                        transition: 'all 0.2s ease',
+                        transform: rating === 0 ? 'scale(1.1)' : 'scale(1)'
+                      }}
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} style={{ width: '24px', height: '24px', color: modalTextColor }}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                    {[1, 2, 3].map((star) => (
                       <button
                         key={star}
-                        onClick={() => setRating(star)}
+                        onClick={() => setRating(rating === star ? 0 : star)}
                         onMouseEnter={() => setHoverRating(star)}
                         onMouseLeave={() => setHoverRating(0)}
                         style={{
-                          background: 'none', border: 'none', fontSize: '36px', cursor: 'pointer', padding: '4px',
-                          color: (hoverRating || rating) >= star ? '#FFD700' : starColorInactive,
+                          background: 'none', border: 'none', cursor: 'pointer', padding: '4px',
+                          opacity: (hoverRating || rating) >= star ? 1 : 0.3,
                           transition: 'all 0.2s ease',
                           transform: (hoverRating || rating) >= star ? 'scale(1.1)' : 'scale(1)'
                         }}
-                      >★</button>
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src="/icons/etoile-michelin.svg"
+                          alt="★"
+                          width={24}
+                          height={24}
+                          style={{
+                            filter: (hoverRating || rating) >= star ? 'none' : 'brightness(0.4)',
+                            display: 'block'
+                          }}
+                        />
+                      </button>
                     ))}
                   </div>
                   <div style={{ fontSize: '12px', color: modalSubTextColor, marginTop: '8px' }}>
                     {rating > 0 && (
                       <span>
                         {rating} étoile{rating > 1 ? 's' : ''}
-                        {rating === 1 && ' - Décevant'}
-                        {rating === 2 && ' - Peut mieux faire'}
-                        {rating === 3 && ' - Correct'}
-                        {rating === 4 && ' - Très bien'}
-                        {rating === 5 && ' - Exceptionnel'}
+                        {rating === 1 && ' - Bon'}
+                        {rating === 2 && ' - Très bon'}
+                        {rating === 3 && ' - Exceptionnel'}
                       </span>
                     )}
                   </div>
@@ -434,7 +457,7 @@ export default function MapClient({ restaurantId }: { restaurantId?: string }) {
 
                 <div style={{ marginBottom: '24px' }}>
                   <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', color: modalSubTextColor, marginBottom: '12px' }}>
-                    Photos (optionnel)
+                    Photo
                   </label>
                   
                   {photos.length > 0 && (
@@ -453,40 +476,36 @@ export default function MapClient({ restaurantId }: { restaurantId?: string }) {
                           <button
                             onClick={() => handleRemovePhoto(photo.id)}
                             style={{
-                              position: 'absolute', top: '2px', right: '2px',
-                              background: 'rgba(0,0,0,0.6)', border: 'none', borderRadius: '50%',
-                              width: '20px', height: '20px',
+                              position: 'absolute', top: '-8px', right: '-8px',
+                              background: '#E4002B', border: 'none', borderRadius: '50%',
+                              width: '24px', height: '24px',
                               display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              cursor: 'pointer', color: 'white', fontSize: '12px'
+                              cursor: 'pointer', color: 'white', fontSize: '14px', padding: '0'
                             }}
-                          >×</button>
+                          >
+                            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={2} style={{ width: '14px', height: '14px' }}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
                         </div>
                       ))}
                     </div>
                   )}
 
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <button
-                      onClick={() => fileInputRef.current?.click()}
-                      style={{
-                        flex: 1, padding: '10px',
-                        backgroundColor: inputBgColor,
-                       
-                        borderRadius: '8px', color: modalTextColor,
-                        fontSize: '13px', cursor: 'pointer'
-                      }}
-                    >Choisir des photos</button>
-                    <button
-                      onClick={startCamera}
-                      style={{
-                        flex: 1, padding: '10px',
-                        backgroundColor: 'inputBgColor',
-                        borderRadius: '8px', color: modalTextColor,
-                        fontSize: '13px', cursor: 'pointer'
-                      }}
-                    > Prendre une photo</button>
-                  </div>
-                  
+                  <button
+                    onClick={startCamera}
+                    disabled={photos.length > 0}
+                    style={{
+                      width: '100%', padding: '10px',
+                      backgroundColor: photos.length > 0 ? '#666' : '#D34807',
+                      borderRadius: '8px', color: 'white',
+                      fontSize: '13px', cursor: photos.length > 0 ? 'not-allowed' : 'pointer', border: 'none',
+                      opacity: photos.length > 0 ? 0.6 : 1
+                    }}
+                  >
+                    {photos.length > 0 ? '✓ Photo prise' : 'Prendre une photo'}
+                  </button>
+
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -495,10 +514,12 @@ export default function MapClient({ restaurantId }: { restaurantId?: string }) {
                     onChange={handleFileSelect}
                     style={{ display: 'none' }}
                   />
-                  
-                  <div style={{ fontSize: '11px', color: modalSubTextColor, marginTop: '8px' }}>
-                    {photos.length === 0 ? 'Ajoutez des photos pour illustrer votre avis' : `${photos.length} photo${photos.length > 1 ? 's' : ''} sélectionnée${photos.length > 1 ? 's' : ''}`}
-                  </div>
+
+                  {photos.length > 0 && (
+                    <div style={{ fontSize: '11px', color: modalSubTextColor, marginTop: '8px' }}>
+                      ✓ Photo ajoutée
+                    </div>
+                  )}
                 </div>
 
                 <div style={{ marginBottom: '24px' }}>
@@ -524,14 +545,14 @@ export default function MapClient({ restaurantId }: { restaurantId?: string }) {
 
                 <button
                   onClick={handleSubmitReview}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || rating === 0 || photos.length === 0 || !reviewText.trim()}
                   style={{
                     width: '100%', padding: '14px',
-                    backgroundColor: isSubmitting ? (isDarkMode ? '#555' : '#ccc') : '#E4002B',
+                    backgroundColor: isSubmitting || rating === 0 || photos.length === 0 || !reviewText.trim() ? (isDarkMode ? '#555' : '#ccc') : '#E4002B',
                     color: 'white', border: 'none', borderRadius: '12px',
                     fontSize: '16px', fontWeight: 'bold',
-                    cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                    opacity: isSubmitting ? 0.7 : 1
+                    cursor: isSubmitting || rating === 0 || photos.length === 0 || !reviewText.trim() ? 'not-allowed' : 'pointer',
+                    opacity: isSubmitting || rating === 0 || photos.length === 0 || !reviewText.trim() ? 0.7 : 1
                   }}
                 >
                   {isSubmitting ? 'Envoi en cours...' : 'Soumettre mon avis'}

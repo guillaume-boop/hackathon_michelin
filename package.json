@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "seed": "npx tsx scripts/seed.ts",
+    "seed:final": "npx tsx scripts/seed-final.ts",
     "migrate:csv": "npx tsx scripts/migrate-csv-columns.ts",
     "import:csv": "npx tsx scripts/import-csv.ts",
     "upload:video": "npx tsx scripts/upload-video.ts",

@@ -36,6 +36,7 @@ type Experience = {
   note: string | null
   visited_at: string
   restaurant_id: string
+  media_urls?: string[]
   restaurants: { id: string; name: string; city: string; michelin_stars: number } | null
 }
 
@@ -82,6 +83,7 @@ export default function UserProfileView({ userId, isSelf, showBackButton = false
   const [selected, setSelected] = useState<Experience | null>(null)
   const [selectedFeed, setSelectedFeed] = useState<ContentItem | null>(null)
   const [openVideo, setOpenVideo] = useState<string | null>(null)
+  const [dynamicScore, setDynamicScore] = useState(0)
 
   useTabAnimation(tab, contentRef)
 
@@ -114,6 +116,24 @@ export default function UserProfileView({ userId, isSelf, showBackButton = false
         .then(d => setFollowing(!!d.following))
     }
   }, [isSelf, session, userId])
+
+  useEffect(() => {
+    const calculateScore = async () => {
+      const experiencesScore = experiences.length * 50
+      const followersScore = followersCount * 2
+
+      let likesScore = 0
+      for (const exp of experiences) {
+        const likeData = await fetch(`/api/experiences/${exp.id}/like`).then(r => r.json()).catch(() => ({}))
+        likesScore += likeData.count ?? 0
+      }
+
+      const total = experiencesScore + followersScore + likesScore
+      setDynamicScore(total)
+    }
+
+    calculateScore()
+  }, [experiences, followersCount])
 
   const handleFollow = async () => {
     if (!session) return
@@ -172,7 +192,7 @@ export default function UserProfileView({ userId, isSelf, showBackButton = false
             onClick={() => setShowMenu(true)}
             className="w-9 h-9 flex items-center justify-center"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={2} className="w-6 h-6">
+            <svg viewBox="0 0 24 24" fill="none" stroke={isLight ? '#262626' : 'white'} strokeWidth={2} className="w-6 h-6">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
             </svg>
           </button>
@@ -181,7 +201,7 @@ export default function UserProfileView({ userId, isSelf, showBackButton = false
             onClick={handleFollow}
             className="px-4 py-1.5 rounded-full text-xs font-bold transition-all active:scale-95"
             style={following
-              ? { background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: 'white' }
+              ? { background: '#D30792', color: 'white' }
               : { background: '#E4002B', color: 'white' }
             }
           >
@@ -253,7 +273,7 @@ export default function UserProfileView({ userId, isSelf, showBackButton = false
 
       {/* ── Score total ──────────────────────────────────────── */}
       <div className="mx-4 mb-5 overflow-visible">
-        <CircleScore score={profile?.circle_score ?? 0} />
+        <CircleScore score={dynamicScore} />
       </div>
 
       {/* ── Sections Chef ────────────────────────────────────── */}
@@ -467,7 +487,7 @@ function ExperienceGrid({ experiences, onSelect }: { experiences: Experience[]; 
             onClick={() => onSelect(exp)}
             className="aspect-square relative overflow-hidden bg-neutral-900 active:opacity-80 transition-opacity"
           >
-            <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(https://picsum.photos/seed/${seed}food/300/300)` }} />
+            <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${exp.media_urls && exp.media_urls.length > 0 ? exp.media_urls[0] : `https://picsum.photos/seed/${seed}food/300/300`})` }} />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
             <div className="absolute bottom-1.5 left-1.5 flex gap-0.5">
               {Array.from({ length: exp.rating }).map((_, i) => (
@@ -586,7 +606,21 @@ function ExperienceSheetContent({
             </svg>
           </button>
         </div>
-        <div className="w-full aspect-square bg-cover bg-center" style={{ backgroundImage: `url(https://picsum.photos/seed/${seed}food/600/600)` }} />
+        {exp.media_urls && exp.media_urls.length > 0 ? (
+          <div className="w-full aspect-square overflow-x-auto flex">
+            {exp.media_urls.map((url, i) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={i}
+                src={url}
+                alt="Experience"
+                className="w-full h-full object-cover flex-shrink-0"
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="w-full aspect-square bg-cover bg-center" style={{ backgroundImage: `url(https://picsum.photos/seed/${seed}food/600/600)` }} />
+        )}
         <div className="px-4 py-3">
           <div className="flex items-center gap-4 mb-2">
             <button
@@ -619,9 +653,17 @@ function ExperienceSheetContent({
           <div className="flex items-center gap-2 mb-1">
             <span className="text-white font-black text-sm">{exp.restaurants?.name ?? 'Restaurant'}</span>
             <span className="text-white/30">·</span>
-            <span className="flex gap-0.5">
-              {Array.from({ length: exp.rating }).map((_, i) => (
-                <span key={i} className="text-xs" style={{ color: '#C9AA71' }}>★</span>
+            <span className="flex gap-1">
+              {Array.from({ length: 3 }).map((_, i) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  key={i}
+                  src="/icons/etoile-michelin.svg"
+                  alt="★"
+                  width={16}
+                  height={16}
+                  style={{ opacity: i < exp.rating ? 1 : 0.3 }}
+                />
               ))}
             </span>
           </div>

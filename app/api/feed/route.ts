@@ -11,7 +11,7 @@ export async function GET(request: Request) {
   const _offset = searchParams.get('offset')
 
   // If no offset provided, use random offset
-  let offset = _offset ? parseInt(_offset, 10) : undefined
+  const offset = _offset ? parseInt(_offset, 10) : undefined
 
   const me = await getCurrentUser()
 
@@ -31,20 +31,16 @@ export async function GET(request: Request) {
     }
   }
 
-  // If offset is not provided, get random posts by fetching with random seed
+  // If offset is not provided, use random ordering
   if (offset === undefined) {
-    // Get total count of posts
-    const { count, error: countError } = await supabaseAdmin
-      .from('feed_posts')
-      .select('*', { count: 'exact', head: true })
-
-    if (countError) return apiError(ServerError(countError.message))
-
-    const total = count ?? 0
-    offset = total > limit ? Math.floor(Math.random() * (total - limit)) : 0
+    query = query.order('random')
+  } else {
+    query = query.order('created_at', { ascending: false }).range(offset, offset + limit - 1)
   }
 
-  query = query.order('created_at', { ascending: false }).range(offset, offset + limit - 1)
+  if (offset === undefined) {
+    query = query.limit(limit)
+  }
 
   const { data, error } = await query
   if (error) return apiError(ServerError(error.message))

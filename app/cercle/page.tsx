@@ -12,6 +12,7 @@ type Experience = {
   rating: number
   note: string | null
   visited_at: string
+  media_urls?: string[]
   restaurant?: { name: string; city: string; country: string; michelin_stars: number; green_stars: boolean }
 }
 
@@ -221,26 +222,49 @@ export default function CerclePage() {
               <p className="text-white/30 text-xs">Ajoute des expériences pour les retrouver ici.</p>
             </div>
           ) : (
-            experiences.map(exp => (
-              <div key={exp.id} className="flex gap-4 p-4 bg-white/5 rounded-2xl border border-white/5">
-                <div className="shrink-0 w-12 h-12 rounded-xl flex items-center justify-center text-2xl" style={{ background: 'rgba(228,0,43,0.15)' }}>
-                  🍽️
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="text-white font-semibold text-sm truncate">{exp.restaurant?.name ?? 'Restaurant'}</p>
-                    <Stars count={exp.restaurant?.michelin_stars ?? 0} green={exp.restaurant?.green_stars} />
+            experiences.map(exp => {
+              const mediaUrls = exp.media_urls as string[] | undefined
+              return (
+                <div key={exp.id} className="flex flex-col gap-3 p-4 bg-white/5 rounded-2xl border border-white/5">
+                  <div className="flex gap-4">
+                    <div className="shrink-0 w-12 h-12 rounded-xl flex items-center justify-center text-2xl" style={{ background: 'rgba(228,0,43,0.15)' }}>
+                      🍽️
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="text-white font-semibold text-sm truncate">{exp.restaurant?.name ?? 'Restaurant'}</p>
+                        <Stars count={exp.restaurant?.michelin_stars ?? 0} green={exp.restaurant?.green_stars} />
+                      </div>
+                      <p className="text-white/40 text-xs mt-0.5">{exp.restaurant?.city} · {new Date(exp.visited_at).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</p>
+                      {exp.note && <p className="text-white/60 text-xs mt-1 line-clamp-1">&ldquo;{exp.note}&rdquo;</p>}
+                    </div>
+                    <div className="flex items-center gap-0.5">
+                      {Array.from({ length: exp.rating }).map((_, i) => (
+                        <span key={i} style={{ color: '#C9AA71' }} className="text-sm">★</span>
+                      ))}
+                    </div>
                   </div>
-                  <p className="text-white/40 text-xs mt-0.5">{exp.restaurant?.city} · {new Date(exp.visited_at).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</p>
-                  {exp.note && <p className="text-white/60 text-xs mt-1 line-clamp-1">&ldquo;{exp.note}&rdquo;</p>}
+                  <div className="flex gap-2 -mx-4 px-4 overflow-x-auto">
+                    {mediaUrls && mediaUrls.length > 0 ? (
+                      mediaUrls.map((url, i) => (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          key={i}
+                          src={url}
+                          alt="Experience"
+                          className="h-24 rounded-lg object-cover flex-shrink-0"
+                        />
+                      ))
+                    ) : (
+                      <div
+                        className="h-24 w-24 rounded-lg bg-cover bg-center flex-shrink-0"
+                        style={{ backgroundImage: `url(https://picsum.photos/seed/${exp.restaurant_id}/100/100)` }}
+                      />
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-center gap-0.5">
-                  {Array.from({ length: exp.rating }).map((_, i) => (
-                    <span key={i} style={{ color: '#C9AA71' }} className="text-sm">★</span>
-                  ))}
-                </div>
-              </div>
-            ))
+              )
+            })
           )}
         </div>
       )}
