@@ -27,16 +27,16 @@ export default function Stars({ count, green = false, size = 'sm', variant = 'in
     )
   }
 
-  // inline — petites étoiles dans le texte
+  // inline
   return (
-    <span className="inline-flex items-center gap-px">
+    <span className={`inline-flex items-center ${gap}`}>
       {Array.from({ length: count }).map((_, i) => (
         // eslint-disable-next-line @next/next/no-img-element
-        <img key={`in-${i}`} src="/icons/etoile-michelin.svg" alt="★" width={12} height={12} className="inline" />
+        <img key={`in-${i}`} src="/icons/etoile-michelin.svg" alt="★" width={dimSize} height={dimSize} className="inline" />
       ))}
       {green && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src="/icons/etoile-michelin.svg" alt="🌿" width={12} height={12} className="inline opacity-60" style={{ filter: 'hue-rotate(120deg)' }} />
+        <img src="/icons/etoile-michelin.svg" alt="🌿" width={dimSize} height={dimSize} className="inline opacity-60" style={{ filter: 'hue-rotate(120deg)' }} />
       )}
     </span>
   )
