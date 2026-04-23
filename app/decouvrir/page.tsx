@@ -170,7 +170,7 @@ export default function DecouvrirPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            <div className={`flex-1 flex items-center gap-3 rounded-2xl px-4 py-3.5 border ${isLight ? 'bg-white border-black/[0.07]' : 'bg-neutral-900 border-white/[0.06]'}`}>
+            <div className={`flex-1 flex items-center gap-1.5 rounded-2xl px-4 py-3.5 border ${isLight ? 'bg-white border-black/[0.07]' : 'bg-neutral-900 border-white/[0.06]'}`}>
               <svg viewBox="0 0 24 24" fill="none" stroke={iconStroke} strokeWidth={1.5} className="w-4 h-4 opacity-40 flex-shrink-0">
                 <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
               </svg>
