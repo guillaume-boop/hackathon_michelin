@@ -33,21 +33,21 @@ const VIDEO_URL = 'https://avtshare01.rz.tu-ilmenau.de/avt-vqdb-uhd-1/test_1/seg
 const DEMO_VIDEOS = Array(10).fill(VIDEO_URL)
 
 const RESTAURANTS = [
-  { name: 'Alain Ducasse au Plaza Athénée', michelin_stars: 3, green_stars: false, city: 'Paris', country: 'France', lat: 48.866, lng: 2.301, description: 'Temple de la gastronomie française. Élégance, raffinement et créativité culinaire dans un cadre somptueux.' },
-  { name: 'Guy Savoy', michelin_stars: 3, green_stars: false, city: 'Paris', country: 'France', lat: 48.862, lng: 2.336, description: 'Maître incontesté de la haute cuisine parisienne. Un voyage sensoriel inoubliable à travers la France.' },
-  { name: 'Le Cinq — Four Seasons', michelin_stars: 3, green_stars: false, city: 'Paris', country: 'France', lat: 48.870, lng: 2.308, description: 'Trois étoiles de pure excellence. Cuisine de prestige servie dans un palace mythique.' },
-  { name: 'L\'Arpège', michelin_stars: 3, green_stars: true, city: 'Paris', country: 'France', lat: 48.855, lng: 2.318, description: 'Alain Passard réinvente la cuisine avec les légumes du terroir. Nature et innovation au cœur.' },
-  { name: 'Mirazur', michelin_stars: 3, green_stars: true, city: 'Menton', country: 'France', lat: 43.776, lng: 7.501, description: 'Perché sur les Alpes Maritimes. Créativité débridée et respect de la nature en harmonie.' },
-  { name: 'Noma', michelin_stars: 2, green_stars: true, city: 'Copenhague', country: 'Danemark', lat: 55.683, lng: 12.598, description: 'Pionnière du Nordique. Saveurs brutes, ingrédients purs, philosophie responsable.' },
-  { name: 'Le Bernardin', michelin_stars: 3, green_stars: false, city: 'New York', country: 'États-Unis', lat: 40.761, lng: -73.982, description: 'Nouvelle York. Poissons et fruits de mer sublimés. Excellence gastronomique made in USA.' },
-  { name: 'Septime', michelin_stars: 1, green_stars: true, city: 'Paris', country: 'France', lat: 48.853, lng: 2.376, description: 'Jeune chef dans l\'air du temps. Produits de marché, cuisine vivante et authentique.' },
-  { name: 'La Grenouillère', michelin_stars: 2, green_stars: true, city: 'La Madelaine-sous-Montreuil', country: 'France', lat: 50.483, lng: 1.750, description: 'Hauts de France. Terre de traditions et d\'innovations culinaires subtiles.' },
-  { name: 'Le Chateaubriand', michelin_stars: 1, green_stars: false, city: 'Paris', country: 'France', lat: 48.864, lng: 2.377, description: 'Cuisine généreuse et de caractère. L\'essence de la bistronimie parisienne.' },
-  { name: 'Flocons de Sel', michelin_stars: 3, green_stars: true, city: 'Megève', country: 'France', lat: 45.856, lng: 6.617, description: 'Montagne. Pureté des ingrédients, délicatesse des techniques, respect de la nature.' },
-  { name: 'Hôtel de Ville — Rochat', michelin_stars: 3, green_stars: false, city: 'Crissier', country: 'Suisse', lat: 46.543, lng: 6.560, description: 'Suisse romande. Élégance helvète et créativité sans limites.' },
-  { name: 'Narisawa', michelin_stars: 2, green_stars: true, city: 'Tokyo', country: 'Japon', lat: 35.671, lng: 139.732, description: 'Tokyo. Dialogues entre tradition japonaise et modernité culinaire.' },
-  { name: 'Restaurant de l\'Hôtel de Ville', michelin_stars: 2, green_stars: false, city: 'Lyon', country: 'France', lat: 45.756, lng: 4.835, description: 'Capitale gastronomique. Cuisine lyonnaise revisitée avec élégance.' },
-  { name: 'Abysse', michelin_stars: 1, green_stars: false, city: 'Paris', country: 'France', lat: 48.878, lng: 2.309, description: 'Cuisine de saveurs. Produits de qualité, technique maîtrisée, âme généreuse.' },
+  { name: 'Alain Ducasse au Plaza Athénée', michelin_stars: 3, green_stars: false, city: 'Paris', country: 'France', lat: 48.866, lng: 2.301, description: 'Temple de la gastronomie française. Élégance, raffinement et créativité culinaire dans un cadre somptueux.', price_range: '$$$$', cuisine: ['French', 'Modern'], facilities: ['Terrasse', 'Cave à vins', 'Parking', 'Service traiteur'] },
+  { name: 'Guy Savoy', michelin_stars: 3, green_stars: false, city: 'Paris', country: 'France', lat: 48.862, lng: 2.336, description: 'Maître incontesté de la haute cuisine parisienne. Un voyage sensoriel inoubliable à travers la France.', price_range: '$$$$', cuisine: ['French', 'Gastronomie'], facilities: ['Bar', 'Réservation requise', 'Parking', 'Climatisation'] },
+  { name: 'Le Cinq — Four Seasons', michelin_stars: 3, green_stars: false, city: 'Paris', country: 'France', lat: 48.870, lng: 2.308, description: 'Trois étoiles de pure excellence. Cuisine de prestige servie dans un palace mythique.', price_range: '$$$$', cuisine: ['French', 'Luxury Dining'], facilities: ['Concierge', 'Service valet', 'Cave à vins', 'Terrasse'] },
+  { name: 'L\'Arpège', michelin_stars: 3, green_stars: true, city: 'Paris', country: 'France', lat: 48.855, lng: 2.318, description: 'Alain Passard réinvente la cuisine avec les légumes du terroir. Nature et innovation au cœur.', price_range: '$$$$', cuisine: ['Vegetarian', 'Modern'], facilities: ['Cuisine ouverte', 'Menu dégustation', 'Parking accessible', 'Climatisation'] },
+  { name: 'Mirazur', michelin_stars: 3, green_stars: true, city: 'Menton', country: 'France', lat: 43.776, lng: 7.501, description: 'Perché sur les Alpes Maritimes. Créativité débridée et respect de la nature en harmonie.', price_range: '$$$$', cuisine: ['Mediterranean', 'Modern'], facilities: ['Terrasse vue mer', 'Parking', 'Réservation requise', 'Bar'] },
+  { name: 'Noma', michelin_stars: 2, green_stars: true, city: 'Copenhague', country: 'Danemark', lat: 55.683, lng: 12.598, description: 'Pionnière du Nordique. Saveurs brutes, ingrédients purs, philosophie responsable.', price_range: '$$$$', cuisine: ['Nordic', 'Seasonal'], facilities: ['Menu dégustation', 'Réservation requise', 'Cave à vins', 'Service conseil'] },
+  { name: 'Le Bernardin', michelin_stars: 3, green_stars: false, city: 'New York', country: 'États-Unis', lat: 40.761, lng: -73.982, description: 'Nouvelle York. Poissons et fruits de mer sublimés. Excellence gastronomique made in USA.', price_range: '$$$$', cuisine: ['Seafood', 'French'], facilities: ['Bar à huître', 'Terrasse', 'Parking', 'Service privé'] },
+  { name: 'Septime', michelin_stars: 1, green_stars: true, city: 'Paris', country: 'France', lat: 48.853, lng: 2.376, description: 'Jeune chef dans l\'air du temps. Produits de marché, cuisine vivante et authentique.', price_range: '$$', cuisine: ['Modern', 'Sharing'], facilities: ['Bar', 'Cuisine ouverte', 'Menu du marché', 'Ambiance décontractée'] },
+  { name: 'La Grenouillère', michelin_stars: 2, green_stars: true, city: 'La Madelaine-sous-Montreuil', country: 'France', lat: 50.483, lng: 1.750, description: 'Hauts de France. Terre de traditions et d\'innovations culinaires subtiles.', price_range: '$$$', cuisine: ['Regional Cuisine', 'Modern'], facilities: ['Terrasse', 'Parking', 'Réservation requise', 'Vue campagne'] },
+  { name: 'Le Chateaubriand', michelin_stars: 1, green_stars: false, city: 'Paris', country: 'France', lat: 48.864, lng: 2.377, description: 'Cuisine généreuse et de caractère. L\'essence de la bistronimie parisienne.', price_range: '$$', cuisine: ['Bistro', 'French'], facilities: ['Bar', 'Ambiance conviviale', 'Menu du jour', 'WiFi gratuit'] },
+  { name: 'Flocons de Sel', michelin_stars: 3, green_stars: true, city: 'Megève', country: 'France', lat: 45.856, lng: 6.617, description: 'Montagne. Pureté des ingrédients, délicatesse des techniques, respect de la nature.', price_range: '$$$', cuisine: ['Alpine Cuisine', 'Modern'], facilities: ['Terrasse vue montagne', 'Parking', 'Spa', 'Cave à vins'] },
+  { name: 'Hôtel de Ville — Rochat', michelin_stars: 3, green_stars: false, city: 'Crissier', country: 'Suisse', lat: 46.543, lng: 6.560, description: 'Suisse romande. Élégance helvète et créativité sans limites.', price_range: '$$$$', cuisine: ['French', 'Suisse'], facilities: ['Terrasse', 'Parking', 'Service traiteur', 'Réservation requise'] },
+  { name: 'Narisawa', michelin_stars: 2, green_stars: true, city: 'Tokyo', country: 'Japon', lat: 35.671, lng: 139.732, description: 'Tokyo. Dialogues entre tradition japonaise et modernité culinaire.', price_range: '$$$', cuisine: ['Japanese', 'Modern'], facilities: ['Comptoir sushi', 'Menu dégustation', 'Parking', 'Réservation requise'] },
+  { name: 'Restaurant de l\'Hôtel de Ville', michelin_stars: 2, green_stars: false, city: 'Lyon', country: 'France', lat: 45.756, lng: 4.835, description: 'Capitale gastronomique. Cuisine lyonnaise revisitée avec élégance.', price_range: '$$$', cuisine: ['Lyonnaise', 'Traditional'], facilities: ['Terrasse', 'Parking', 'Menu dégustation', 'Cave à vins'] },
+  { name: 'Abysse', michelin_stars: 1, green_stars: false, city: 'Paris', country: 'France', lat: 48.878, lng: 2.309, description: 'Cuisine de saveurs. Produits de qualité, technique maîtrisée, âme généreuse.', price_range: '$$', cuisine: ['Modern', 'Contemporary'], facilities: ['Bar', 'Menu découverte', 'Ambiance chic', 'Service attentif'] },
 ]
 
 const USERS = [
@@ -233,14 +233,16 @@ async function seedLocations(users: { id: string }[]) {
 
 async function seedRestaurantVideos(restaurants: { id: string; name: string }[]) {
   console.log('🎬 Insertion des vidéos restaurants…')
-  const videos = restaurants.slice(0, 5).map((restaurant, i) => ({
-    restaurant_id: restaurant.id,
-    url: DEMO_VIDEOS[i] ?? DEMO_VIDEOS[0],
-    title: `Dans les cuisines de ${restaurant.name}`,
-    order: 1,
-  }))
+  const FEED_BASE_URL = 'https://pplmaklememeytkghcgc.supabase.co/storage/v1/object/public/feed'
+  const videos = restaurants.flatMap((restaurant) =>
+    Array.from({ length: 5 }).map((_, i) => ({
+      restaurant_id: restaurant.id,
+      url: `${FEED_BASE_URL}/feed${i + 1}.mov`,
+      order: i + 1,
+    }))
+  )
   await supabase.from('restaurant_videos').insert(videos)
-  console.log(`  ✓ ${videos.length} vidéos restaurant`)
+  console.log(`  ✓ ${videos.length} vidéos restaurant (${videos.length / restaurants.length} par restaurant)`)
 }
 
 async function main() {

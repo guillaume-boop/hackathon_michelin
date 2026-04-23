@@ -18,10 +18,13 @@ type Restaurant = {
   name: string
   city: string
   country: string
-  michelin_stars: number
-  green_stars: boolean
+  michelin_stars?: number
+  green_stars?: boolean
   description?: string
   dietary_option?: string | null
+  facilities?: string | string[]
+  website_url?: string
+  michelin_url?: string
 }
 
 type Chef = {
@@ -52,12 +55,36 @@ const MOCK_CUISINE: Record<number, string> = {
 }
 
 
-const MOCK_PRACTICAL = [
-  { icon: '🍷', label: 'Sommelier\nPairing' },
-  { icon: '👔', label: 'Formal\nAttire' },
-  { icon: '⏱', label: '2–4 Hour\nExp.' },
-  { icon: '🅿️', label: 'Valet\nAvailable' },
-]
+const FACILITY_ICONS: Record<string, string> = {
+  'Terrasse': '🌿',
+  'Bar': '🍸',
+  'Cave à vins': '🍷',
+  'Parking': '🅿️',
+  'Réservation requise': '📅',
+  'Menu dégustation': '🍽',
+  'Cuisine ouverte': '👨‍🍳',
+  'Menu du marché': '🥕',
+  'Ambiance décontractée': '😊',
+  'Service traiteur': '🎉',
+  'Climatisation': '❄️',
+  'Menu découverte': '✨',
+  'Ambiance chic': '✨',
+  'Service attentif': '👋',
+  'Comptoir sushi': '🍣',
+  'Parking accessible': '♿',
+  'Concierge': '🔔',
+  'Service valet': '🚗',
+  'Terrasse vue mer': '🌊',
+  'Spa': '💆',
+  'Bar à huître': '🦪',
+  'Terrasse vue montagne': '⛰️',
+  'Vue campagne': '🌾',
+  'WiFi gratuit': '📶',
+  'Service privé': '👑',
+  'Service conseil': '💡',
+  'Accessible PMR': '♿',
+  'Chaise haute pour enfants': '👶',
+}
 
 const MOCK_DISHES = [
   { id: 'm1', name: 'Amuse Bouche', description: 'Smoked oyster pearl, caviar, algue marine', photo_url: 'https://picsum.photos/seed/amuse/300/300', order: 1 },
@@ -189,7 +216,7 @@ export default function RestaurantPageClient({ restaurant, chefs, posts, menuDis
         </div>
 
         {/* ── Identité ─────────────────────────── */}
-        <div className="px-6 pt-5 text-center">
+        <div className="px-4 pt-5 text-center">
           <h1 className={`text-3xl font-black tracking-tight leading-tight uppercase ${title}`}>{restaurant.name}</h1>
           <p className="text-xl font-semibold mt-1.5 mb-4" style={{ color: '#E4002B' }}>{cuisine}</p>
           {(stars > 0 || restaurant.green_stars) && (
@@ -198,7 +225,7 @@ export default function RestaurantPageClient({ restaurant, chefs, posts, menuDis
             </div>
           )}
           {restaurant.description && (
-            <p className={`text-sm leading-relaxed max-w-xs mx-auto ${isLight ? 'text-black/60' : 'text-white/60'}`}>{restaurant.description}</p>
+            <p className={`text-sm leading-relaxed mb-6 ${isLight ? 'text-black/60' : 'text-white/60'}`}>{restaurant.description}</p>
           )}
         </div>
 
@@ -247,18 +274,24 @@ export default function RestaurantPageClient({ restaurant, chefs, posts, menuDis
           )
         })()}
 
-        {/* ── Ce qui nous a plu ─────────────────── */}
-        <div className="mx-4 mt-8">
-          <p className={`${sectionTitle} mb-3`}>Ce qui nous a plu :</p>
-          <div className="grid grid-cols-4 gap-2">
-            {MOCK_PRACTICAL.map(({ icon, label }) => (
-              <div key={label} className={`flex flex-col items-center gap-1.5 py-3 px-1 rounded-xl border ${cardBg}`}>
-                <span className="text-xl">{icon}</span>
-                <span className={`text-[10px] text-center leading-tight font-normal whitespace-pre-line ${sub}`}>{label}</span>
+        {/* ── Petits plus ─────────────────────── */}
+        {(() => {
+          const facilities = restaurant.facilities
+          const facilitiesArray = Array.isArray(facilities) ? facilities : typeof facilities === 'string' ? facilities.split(',').map(f => f.trim()) : []
+          return facilitiesArray.length > 0 ? (
+            <div className="mx-4 mt-8">
+              <p className={`${sectionTitle} mb-3`}>Petits plus :</p>
+              <div className="grid grid-cols-4 gap-2">
+                {facilitiesArray.map((facility) => (
+                  <div key={facility} className={`flex flex-col items-center gap-1.5 py-3 px-1 rounded-xl border ${cardBg}`}>
+                    <span className="text-xl">{FACILITY_ICONS[facility] ?? '✨'}</span>
+                    <span className={`text-[10px] text-center leading-tight font-normal ${sub}`}>{facility}</span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
+          ) : null
+        })()}
 
         {/* ── Chefs ─────────────────────────────── */}
         {chefs.length > 0 && (
@@ -352,6 +385,10 @@ export default function RestaurantPageClient({ restaurant, chefs, posts, menuDis
         {/* ── Sticky CTA ─────────────────────────── */}
         <div className={`fixed bottom-0 left-0 right-0 z-30 px-4 pb-10 pt-4 bg-gradient-to-t ${isLight ? 'from-[#F5F5F5]' : 'from-neutral-950'} to-transparent`}>
           <button
+            onClick={() => {
+              const url = restaurant.website_url || restaurant.michelin_url
+              if (url) window.open(url, '_blank')
+            }}
             className="w-full py-4 rounded-2xl font-black text-white text-sm tracking-widest uppercase active:scale-[0.98] transition-transform"
             style={{ background: '#E4002B' }}
           >

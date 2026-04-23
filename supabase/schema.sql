@@ -22,6 +22,9 @@ create table if not exists restaurants (
   lat double precision not null default 0,
   lng double precision not null default 0,
   description text,
+  budget smallint check (budget between 0 and 4),
+  cuisine_type text[] default '{}',
+  facilities text[] default '{}',
   created_at timestamptz not null default now()
 );
 
@@ -38,6 +41,11 @@ create table if not exists experiences (
 
 -- xrp_tx_hash: transaction hash on XRP Ledger Testnet, set when restaurant is created via admin
 alter table restaurants add column if not exists xrp_tx_hash text;
+
+-- Price range, cuisine type, and facilities
+alter table restaurants add column if not exists price_range text;
+alter table restaurants add column if not exists cuisine_type text[] default '{}';
+alter table restaurants add column if not exists facilities text[] default '{}';
 
 -- Feed posts
 create table if not exists feed_posts (

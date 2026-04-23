@@ -99,7 +99,6 @@ function AmisContent() {
     if (list.length === 0) {
       return (
         <div className="flex flex-col items-center gap-3 py-16 text-center">
-          <span className="text-4xl">🍽</span>
           <p className="text-gray-900 dark:text-white font-semibold">{emptyLabel}</p>
         </div>
       )
