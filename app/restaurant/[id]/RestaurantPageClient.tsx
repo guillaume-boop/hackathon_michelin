@@ -22,7 +22,7 @@ type Restaurant = {
   green_stars?: boolean
   description?: string
   dietary_option?: string | null
-  facilities?: string[]
+  facilities?: string | string[]
   website_url?: string
   michelin_url?: string
 }
@@ -276,7 +276,8 @@ export default function RestaurantPageClient({ restaurant, chefs, posts, menuDis
 
         {/* ── Petits plus ─────────────────────── */}
         {(() => {
-          const facilitiesArray = restaurant.facilities ?? []
+          const facilities = restaurant.facilities
+          const facilitiesArray = Array.isArray(facilities) ? facilities : typeof facilities === 'string' ? facilities.split(',').map(f => f.trim()) : []
           return facilitiesArray.length > 0 ? (
             <div className="mx-4 mt-8">
               <p className={`${sectionTitle} mb-3`}>Petits plus :</p>
