@@ -1,4 +1,4 @@
-/** @type {import('next').NextConfig} */
+/** @type {import('next').NextConfig} */ 
 const nextConfig = {
   transpilePackages: ['leaflet', 'leaflet.markercluster'],
   images: {
