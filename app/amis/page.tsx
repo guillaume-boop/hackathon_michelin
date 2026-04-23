@@ -128,11 +128,11 @@ function AmisContent() {
 
   const suivisList = amis
     .filter(a => a.users)
-    .map(a => ({ id: a.followee_id, username: a.users!.username, avatar_url: a.users!.avatar_url, href: `/chef/${a.followee_id}` }))
+    .map(a => ({ id: a.followee_id, username: a.users!.username, avatar_url: a.users!.avatar_url, href: `/user/${a.followee_id}` }))
 
   const followersList = followers
     .filter(f => f.users)
-    .map(f => ({ id: f.follower_id, username: f.users!.username, avatar_url: f.users!.avatar_url, href: `/chef/${f.follower_id}` }))
+    .map(f => ({ id: f.follower_id, username: f.users!.username, avatar_url: f.users!.avatar_url, href: `/user/${f.follower_id}` }))
 
   return (
     <div className="flex h-screen bg-white dark:bg-black">

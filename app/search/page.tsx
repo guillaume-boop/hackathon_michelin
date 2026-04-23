@@ -115,7 +115,7 @@ export default function SearchPage() {
               <button
                 key={s}
                 onClick={() => setQuery(s)}
-                className="px-4 py-2 rounded-full bg-neutral-900 border border-white/5 text-white/70 text-sm font-medium"
+                className="px-3 py-1.5 rounded-full bg-neutral-900 border border-white/5 text-white/70 text-xs font-medium"
               >
                 {s}
               </button>
