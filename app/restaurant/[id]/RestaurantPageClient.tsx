@@ -207,25 +207,6 @@ export default function RestaurantPageClient({
           {/* Conteneur centré avec max-w-4xl */}
           <div className="w-full max-w-4xl">
 
-            {/* Mobile Header */}
-            <div className="lg:hidden fixed top-0 left-0 right-0 z-30 px-4 py-3 bg-white/80 dark:bg-black/80 backdrop-blur-sm">
-              <div className="flex items-center justify-between">
-                <span className="font-black text-lg text-gray-900 dark:text-white">MICHELIN</span>
-                <Link
-                  href="/profil"
-                  className="w-8 h-8 rounded-full overflow-hidden bg-gray-300 dark:bg-gray-700 ring-2 ring-[#E4002B]/20"
-                >
-                  {session?.user?.image ? (
-                    <Image src={session.user.image} alt="Avatar" width={32} height={32} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-xs font-bold text-gray-600 dark:text-gray-400">
-                      {session?.user?.email?.[0]?.toUpperCase() || '?'}
-                    </div>
-                  )}
-                </Link>
-              </div>
-            </div>
-
             {/* ── Hero ── */}
             <div className="relative w-full" style={{ height: '48vh', minHeight: 280 }}>
               <div
