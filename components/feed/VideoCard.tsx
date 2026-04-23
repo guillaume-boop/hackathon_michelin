@@ -29,8 +29,13 @@ export default function VideoCard({ post, isActive, muted, onAuthRequired, sessi
   useEffect(() => {
     const video = videoRef.current
     if (!video || videoError) return
+
+    // Sync muted state to DOM element before playing
+    video.muted = muted
+
     if (isActive) {
       video.play().catch(() => {
+        // Force mute and retry if autoplay fails
         video.muted = true
         video.play().catch(() => setVideoError(true))
       })
@@ -39,7 +44,7 @@ export default function VideoCard({ post, isActive, muted, onAuthRequired, sessi
       video.currentTime = 0
       setVideoReady(false)
     }
-  }, [isActive, videoError])
+  }, [isActive, videoError, muted])
 
   const handleLike = useCallback(async () => {
     if (!sessionUserId) { onAuthRequired(); return }
