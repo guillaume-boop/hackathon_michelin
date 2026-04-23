@@ -546,7 +546,7 @@ export default function MapClient({ restaurantId }: { restaurantId?: string }) {
         <div
           style={{
             position: 'fixed',
-            top: 0, left: 0, right: 0, bottom: 0,
+            top: 40, left: 0, right: 0, bottom: 0,
             backgroundColor: 'black',
             zIndex: 2000,
             display: 'flex',
