@@ -2,8 +2,16 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import Stars from '@/components/ui/Stars'
+
+type FriendRating = {
+  userId: string
+  username: string
+  avatar_url: string | null
+  rating: number
+}
 
 type Restaurant = {
   id: string
@@ -79,9 +87,44 @@ export default function RestaurantPageClient({ restaurant, chefs, posts, menuDis
   menuDishes: Dish[]
 }) {
   const router = useRouter()
+  const { data: session } = useSession()
   const [liked, setLiked] = useState(false)
   const [openVideo, setOpenVideo] = useState<string | null>(null)
   const [isLight, setIsLight] = useState(false)
+  const [friendRatings, setFriendRatings] = useState<FriendRating[]>([])
+
+  useEffect(() => {
+    const uid = (session?.user as { id?: string })?.id
+    if (!uid) return
+    Promise.all([
+      fetch(`/api/users/${uid}/following`).then(r => r.json()),
+      fetch(`/api/experiences?restaurant_id=${restaurant.id}`).then(r => r.json()),
+    ]).then(([following, experiences]) => {
+      const followingList = Array.isArray(following) ? following : []
+      const expList = Array.isArray(experiences) ? experiences : []
+      const friendMap = new Map<string, { username: string; avatar_url: string | null }>(
+        followingList.map((f: { followee_id: string; users: { username: string; avatar_url: string | null } | { username: string; avatar_url: string | null }[] }) => {
+          const u = Array.isArray(f.users) ? f.users[0] : f.users
+          return [f.followee_id, { username: u?.username ?? '', avatar_url: u?.avatar_url ?? null }]
+        })
+      )
+      // expList is ordered by visited_at DESC — first occurrence per user = most recent
+      const seen = new Set<string>()
+      const ratings: FriendRating[] = expList
+        .filter((e: { user_id: string }) => {
+          if (!friendMap.has(e.user_id) || seen.has(e.user_id)) return false
+          seen.add(e.user_id)
+          return true
+        })
+        .map((e: { user_id: string; rating: number }) => ({
+          userId: e.user_id,
+          username: friendMap.get(e.user_id)!.username,
+          avatar_url: friendMap.get(e.user_id)!.avatar_url,
+          rating: e.rating,
+        }))
+      setFriendRatings(ratings)
+    }).catch(() => {})
+  }, [session, restaurant.id])
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-color-scheme: light)')
@@ -175,39 +218,82 @@ export default function RestaurantPageClient({ restaurant, chefs, posts, menuDis
           </p>
         </div>
 
+        {/* ── Note amis ────────────────────────── */}
+        {friendRatings.length > 0 && (() => {
+          const avg = friendRatings.reduce((s, f) => s + f.rating, 0) / friendRatings.length
+          return (
+            <div className={`mx-4 mt-5 p-4 rounded-2xl border flex items-center gap-3 ${cardBg}`}>
+              <div className="flex -space-x-2 flex-shrink-0">
+                {friendRatings.slice(0, 3).map(f => (
+                  <div key={f.userId} className="w-8 h-8 rounded-full overflow-hidden border-2 border-white bg-neutral-700">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={f.avatar_url ?? `https://picsum.photos/seed/${f.username}/80/80`} alt="" className="w-full h-full object-cover" />
+                  </div>
+                ))}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className={`text-xs font-semibold ${title}`}>
+                  {friendRatings.length === 1
+                    ? `${friendRatings[0].username} a noté ce restaurant`
+                    : `${friendRatings.length} amis ont noté ce restaurant`}
+                </p>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <Stars count={Math.round(avg)} size="xs" />
+                  <span className={`text-xs font-bold ${title}`}>{avg.toFixed(1)}</span>
+                  <span className={`text-xs ${sub}`}>/ 5</span>
+                </div>
+              </div>
+            </div>
+          )
+        })()}
+
+        {/* ── Ce qui nous a plu ─────────────────── */}
+        <div className="mx-4 mt-8">
+          <p className={`${sectionTitle} mb-3`}>Ce qui nous a plu :</p>
+          <div className="grid grid-cols-4 gap-2">
+            {MOCK_PRACTICAL.map(({ icon, label }) => (
+              <div key={label} className={`flex flex-col items-center gap-1.5 py-3 px-1 rounded-xl border ${cardBg}`}>
+                <span className="text-xl">{icon}</span>
+                <span className={`text-[10px] text-center leading-tight font-normal whitespace-pre-line ${sub}`}>{label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* ── Chefs ─────────────────────────────── */}
         {chefs.length > 0 && (
           <div className="mt-8 px-4">
-            <p className={`${sectionTitle} text-center mb-4`}>
-              {chefs.length > 1 ? 'Nos Chefs' : 'Chef Exécutif'}
-            </p>
+            <p className={`${sectionTitle} mb-4`}>Chef</p>
             <div className="flex flex-col gap-3">
               {chefs.map((chef) => {
                 const avatarSeed = chef.users?.username ?? chef.id.slice(0, 6)
-                const avatarUrl = chef.users?.avatar_url ?? `https://picsum.photos/seed/${avatarSeed}/100/100`
+                const avatarUrl = chef.users?.avatar_url ?? `https://picsum.photos/seed/${avatarSeed}/200/200`
                 return (
                   <Link
                     key={chef.id}
                     href={`/chef/${chef.id}`}
-                    className={`flex flex-col items-center gap-2 p-5 rounded-2xl border active:opacity-80 transition-opacity ${cardBg}`}
+                    className="flex items-center gap-4 p-5 rounded-2xl active:opacity-90 transition-opacity"
+                    style={{ background: '#E4002B' }}
                   >
-                    <div className="w-16 h-16 rounded-full overflow-hidden bg-neutral-700 flex-shrink-0">
+                    {/* Texte gauche */}
+                    <div className="flex-1 min-w-0 flex flex-col gap-2">
+                      <p className="text-white font-black text-xl leading-tight">
+                        {chef.users?.username ?? 'Chef'}
+                      </p>
+                      {chef.bio && (
+                        <p className="text-white text-xs italic leading-relaxed line-clamp-3">
+                          &ldquo;{chef.bio}&rdquo;
+                        </p>
+                      )}
+                      <span className="self-start mt-1 px-4 py-1.5 rounded-full text-xs font-semibold bg-white" style={{ color: '#666' }}>
+                        Voir
+                      </span>
+                    </div>
+                    {/* Photo droite */}
+                    <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-white/30 flex-shrink-0">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
                     </div>
-                    <div className="text-center">
-                      <p className={`font-black text-sm ${title}`}>{chef.users?.username ?? 'Chef'}</p>
-                      <p className={`text-[10px] uppercase tracking-widest font-semibold mb-1 ${sub}`}>Executive Chef</p>
-                      {chef.bio && (
-                        <p className={`text-xs italic leading-relaxed line-clamp-3 ${isLight ? 'text-black/50' : 'text-white/50'}`}>&ldquo;{chef.bio}&rdquo;</p>
-                      )}
-                    </div>
-                    <span className={`text-[10px] font-semibold flex items-center gap-1 mt-1 ${sub}`}>
-                      Voir le profil
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-3 h-3">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                      </svg>
-                    </span>
                   </Link>
                 )
               })}
@@ -218,8 +304,7 @@ export default function RestaurantPageClient({ restaurant, chefs, posts, menuDis
         {/* ── Menu carousel ──────────────────────── */}
         <div className="mt-8">
           <div className="flex items-center justify-between px-4 mb-3">
-            <p className={sectionTitle}>The Tasting Menu</p>
-            <button className={`text-xs font-normal ${sub}`}>Voir tout</button>
+            <p className={sectionTitle}>À la carte</p>
           </div>
           <div className="flex gap-3 overflow-x-auto px-4 pb-2">
             {dishes.map((dish) => {
@@ -237,16 +322,6 @@ export default function RestaurantPageClient({ restaurant, chefs, posts, menuDis
               )
             })}
           </div>
-        </div>
-
-        {/* ── Infos pratiques ────────────────────── */}
-        <div className="mx-4 mt-6 grid grid-cols-4 gap-2">
-          {MOCK_PRACTICAL.map(({ icon, label }) => (
-            <div key={label} className={`flex flex-col items-center gap-1.5 py-3 px-1 rounded-xl border ${cardBg}`}>
-              <span className="text-xl">{icon}</span>
-              <span className={`text-[10px] text-center leading-tight font-normal whitespace-pre-line ${sub}`}>{label}</span>
-            </div>
-          ))}
         </div>
 
         {/* ── Feed vidéos ───────────────────────── */}
