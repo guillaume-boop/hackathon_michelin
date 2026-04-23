@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react'
 import { useParams } from 'next/navigation'
 import UserProfileView from '@/components/profile/UserProfileView'
 import BottomNav from '@/components/layout/BottomNav'
+import LoadingScreen from '@/components/ui/LoadingScreen'
 
 export default function ChefPage() {
   const { id } = useParams<{ id: string }>()
@@ -39,13 +40,7 @@ export default function ChefPage() {
     )
   }
 
-  if (!userId) {
-    return (
-      <div className="flex items-center justify-center h-dvh bg-neutral-950">
-        <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-      </div>
-    )
-  }
+  if (!userId) return <LoadingScreen />
 
   const isSelf = session?.user?.id === userId
 

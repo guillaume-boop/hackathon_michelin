@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react'
 import UserProfileView from '@/components/profile/UserProfileView'
 import AuthGateModal from '@/components/ui/AuthGateModal'
 import BottomNav from '@/components/layout/BottomNav'
+import LoadingScreen from '@/components/ui/LoadingScreen'
 
 export default function ProfilPage() {
   const { data: session, status } = useSession()
@@ -19,13 +20,7 @@ export default function ProfilPage() {
     return () => mq.removeEventListener('change', handler)
   }, [])
 
-  if (status === 'loading') {
-    return (
-      <div className="flex items-center justify-center min-h-dvh bg-black">
-        <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-      </div>
-    )
-  }
+  if (status === 'loading') return <LoadingScreen />
 
   if (!session) {
     return (

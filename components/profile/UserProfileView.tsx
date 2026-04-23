@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import BottomNav from '@/components/layout/BottomNav'
 import Stars from '@/components/ui/Stars'
 import CircleScore from '@/components/ui/CircleScore'
+import LoadingScreen from '@/components/ui/LoadingScreen'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -120,13 +121,7 @@ export default function UserProfileView({ userId, isSelf, showBackButton = false
     else setSelected(item as unknown as Experience)
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-dvh bg-black">
-        <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-      </div>
-    )
-  }
+  if (loading) return <LoadingScreen />
 
   const avatarUrl = profile?.avatar_url ?? `https://picsum.photos/seed/${profile?.username ?? userId}/200/200`
   const isChef = profile?.role === 'chef'
