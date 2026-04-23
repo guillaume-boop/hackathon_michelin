@@ -20,7 +20,7 @@ export default function FeedPage() {
   const [showFilterPanel, setShowFilterPanel] = useState(false)
   const [muted, setMuted] = useState(true)
   const [viewMode, setViewMode] = useState<'single' | 'grid'>('single')
-  const [videoReadyMap, setVideoReadyMap] = useState<Map<number, boolean>>(new Map())
+  const videoReadyMapRef = useRef<Map<number, boolean>>(new Map())
   const containerRef = useRef<HTMLDivElement>(null)
   const gridCacheRef = useRef<HTMLDivElement>(null)
   const loaderRef = useRef<HTMLDivElement>(null) // Ref pour le loader observable
@@ -38,9 +38,16 @@ export default function FeedPage() {
   const MIN_SCROLL_INTERVAL = 0 // No scroll throttle — change immediately
 
   const fetchPostAtIndex = useCallback(async (idx: number) => {
-    // Don't fetch if already fetched or currently fetching
-    if (fetchedIndicesRef.current.has(idx)) return
-    if (isFetchingRef.current && !pendingAbortControllersRef.current.has(idx)) return // Skip if another is fetching (unless this is a preload)
+    // Don't fetch if already fetching
+    if (isFetchingRef.current) return
+
+    // Calculate batch start (round down to nearest BATCH_SIZE)
+    const batchStart = Math.floor(idx / BATCH_SIZE) * BATCH_SIZE
+
+    // Skip if we've already fetched this batch
+    const allFetched = Array.from({ length: BATCH_SIZE }, (_, i) => batchStart + i)
+      .every(i => fetchedIndicesRef.current.has(i))
+    if (allFetched) return
 
     setLoadingMore(true)
     isFetchingRef.current = true
@@ -48,44 +55,44 @@ export default function FeedPage() {
     // Create an AbortController for this fetch
     const abortController = new AbortController()
     pendingAbortControllersRef.current.set(idx, abortController)
-    
+
     try {
-      // Fetch just this one post with abort signal
-      const res = await fetch(`/api/feed?limit=1&offset=${idx}`, {
+      // Fetch batch of BATCH_SIZE posts starting from batchStart
+      const res = await fetch(`/api/feed?limit=${BATCH_SIZE}&offset=${batchStart}`, {
         signal: abortController.signal
       })
       const data = await res.json()
-      const newPost = Array.isArray(data) ? data[0] : null
+      const newPosts = Array.isArray(data) ? data : []
 
-      if (newPost) {
-        console.log(`✓ Fetched video ${idx}`)
-        // Insert at correct position or update if exists
+      if (newPosts.length > 0) {
         setPosts(prev => {
           const updated = [...prev]
-          while (updated.length <= idx) {
-            updated.push(null as FeedPostWithRestaurant | null) // Fill gaps with null temporarily
-          }
-          updated[idx] = newPost
+          newPosts.forEach((post, i) => {
+            const postIdx = batchStart + i
+            while (updated.length <= postIdx) {
+              updated.push(null)
+            }
+            updated[postIdx] = post
+          })
           return updated
         })
-      } else {
-        console.log(`✗ No video at index ${idx}`)
       }
-      // Mark as fetched even if it failed (to avoid infinite retries)
-      fetchedIndicesRef.current.add(idx)
+
+      // Mark all indices in batch as fetched (even if empty - means we've reached end)
+      for (let i = 0; i < BATCH_SIZE; i++) {
+        fetchedIndicesRef.current.add(batchStart + i)
+      }
     } catch (error) {
       // Only log if it's not an abort error
       if (error instanceof Error && error.name !== 'AbortError') {
-        console.error(`Failed to fetch post at index ${idx}:`, error)
-        // Still mark as fetched even on error so we don't retry infinitely
-        fetchedIndicesRef.current.add(idx)
+        // Silently fail
       }
     } finally {
       setLoadingMore(false)
       isFetchingRef.current = false
       pendingAbortControllersRef.current.delete(idx)
     }
-  }, [])
+  }, [BATCH_SIZE])
 
   // Initial load: fetch first batch
   useEffect(() => {
@@ -99,7 +106,7 @@ export default function FeedPage() {
         newPosts.forEach((_, i) => fetchedIndicesRef.current.add(i))
         setLoading(false)
       } catch (error) {
-        console.error('Failed to fetch initial posts:', error)
+        // Silently fail
         setLoading(false)
       }
     }
@@ -154,7 +161,7 @@ export default function FeedPage() {
       
       const handleWheel = (e: WheelEvent) => {
         // Block scroll only if current video is still loading
-        const currentVideoReady = videoReadyMap.get(activeIndex) ?? false
+        const currentVideoReady = videoReadyMapRef.current.get(activeIndex) ?? false
         if (!currentVideoReady) {
           e.preventDefault()
         }
@@ -267,7 +274,7 @@ export default function FeedPage() {
         gridContainer.removeEventListener('scroll', handleScroll)
       }
     }
-  }, [filteredPosts, viewMode, fetchPostAtIndex, posts.length, MIN_SCROLL_INTERVAL, activeIndex, videoReadyMap])
+  }, [filteredPosts, viewMode, fetchPostAtIndex, posts.length, MIN_SCROLL_INTERVAL, activeIndex])
 
   useEffect(() => {
     if (viewMode === 'single') {
@@ -591,7 +598,7 @@ export default function FeedPage() {
                         muted={muted}
                         onAuthRequired={() => setShowAuthGate(true)}
                         sessionUserId={session?.user?.id}
-                        onReadyChange={(ready) => setVideoReadyMap(m => new Map(m).set(idx, ready))}
+                        onReadyChange={(ready) => { videoReadyMapRef.current.set(idx, ready) }}
                       />
                     </div>
                     )
