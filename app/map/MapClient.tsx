@@ -444,6 +444,7 @@ export default function MapClient({ restaurantId }: { restaurantId?: string }) {
                     }}>
                       {photos.map((photo) => (
                         <div key={photo.id} style={{ position: 'relative', flexShrink: 0 }}>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={photo.preview}
                             alt="Preview"
@@ -602,6 +603,7 @@ export default function MapClient({ restaurantId }: { restaurantId?: string }) {
               }}>
                 {photos.map((photo) => (
                   <div key={photo.id} style={{ position: 'relative', flexShrink: 0 }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={photo.preview}
                       alt="Captured"

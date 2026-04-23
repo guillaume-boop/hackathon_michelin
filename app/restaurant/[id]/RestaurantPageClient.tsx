@@ -167,7 +167,7 @@ export default function RestaurantPageClient({ restaurant, chefs, posts, menuDis
   const cuisine = MOCK_CUISINE[stars] ?? MOCK_CUISINE[0]
   const dishes = menuDishes.length > 0 ? menuDishes : MOCK_DISHES
   const videos = posts.filter(p => p.content_url)
-  const heroVideo = videos.length > 0 ? videos[Math.floor(Math.random() * videos.length)] : null
+  const heroVideo = videos.length > 0 ? videos[0] : null
 
   const bg = isLight ? 'bg-[#F5F5F5]' : 'bg-neutral-950'
   const cardBg = isLight ? 'bg-white border-black/[0.07]' : 'bg-neutral-900 border-white/5'
@@ -312,25 +312,27 @@ export default function RestaurantPageClient({ restaurant, chefs, posts, menuDis
     // }
     
     // Icône par défaut
-    return '/svg/default.svg'
+    return '/icons/etoile-michelin.svg'
   }
-  
+
   return facilitiesArray.length > 0 ? (
     <div className="mx-4 mt-8">
-      <p className={`${sectionTitle} mb-3`}>Petits plus :</p>
-      <div className="grid grid-cols-4 gap-2">
+      <p className={`${sectionTitle} mb-4`}>Petits plus :</p>
+      <div className="grid grid-cols-4 gap-3">
         {facilitiesArray.map((facility) => (
-          <div key={facility} className={`flex flex-col items-center gap-1.5 py-3 px-1 rounded-xl ${cardBg}`}>
-            <img 
-              src={getFacilityIcon(facility)}
-              alt={facility}
-              className="w-6 h-6 object-contain"
-              onError={(e) => {
-                // Si l'image n'existe pas, utiliser l'icône par défaut
-                (e.target as HTMLImageElement).src = '/svg/default.svg'
-              }}
-            />
-            <span className={`text-[10px] text-center leading-tight font-normal ${sub}`}>{facility}</span>
+          <div key={facility} className="flex flex-col items-center gap-2">
+            <div className="w-16 h-16 rounded-full bg-white border border-gray-300 flex items-center justify-center flex-shrink-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={getFacilityIcon(facility)}
+                alt={facility}
+                className="w-7 h-7 object-contain"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/icons/etoile-michelin.svg'
+                }}
+              />
+            </div>
+            <span className={`text-[11px] text-center leading-tight font-normal text-gray-700`}>{facility}</span>
           </div>
         ))}
       </div>
