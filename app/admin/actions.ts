@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { supabaseAdmin } from '@/lib/supabase'
+import { logRestaurantOnChain } from '@/lib/xrp'
 
 function parseRestaurantForm(formData: FormData) {
   return {
@@ -17,8 +18,17 @@ function parseRestaurantForm(formData: FormData) {
 }
 
 export async function createRestaurant(formData: FormData) {
-  const { error } = await supabaseAdmin.from('restaurants').insert(parseRestaurantForm(formData))
+  const payload = parseRestaurantForm(formData)
+  const { data, error } = await supabaseAdmin.from('restaurants').insert(payload).select('id').single()
   if (error) throw new Error(error.message)
+
+  try {
+    const txHash = await logRestaurantOnChain(payload)
+    await supabaseAdmin.from('restaurants').update({ xrp_tx_hash: txHash }).eq('id', data.id)
+  } catch {
+    // non-fatal: restaurant saved, blockchain log failed silently
+  }
+
   revalidatePath('/admin/restaurants')
   redirect('/admin/restaurants')
 }

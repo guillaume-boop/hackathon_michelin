@@ -36,6 +36,9 @@ create table if not exists experiences (
   visited_at timestamptz not null default now()
 );
 
+-- xrp_tx_hash: transaction hash on XRP Ledger Testnet, set when restaurant is created via admin
+alter table restaurants add column if not exists xrp_tx_hash text;
+
 -- Feed posts
 create table if not exists feed_posts (
   id uuid primary key default gen_random_uuid(),

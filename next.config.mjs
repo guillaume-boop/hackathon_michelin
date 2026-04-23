@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  serverExternalPackages: ['xrpl'],
   transpilePackages: ['leaflet', 'leaflet.markercluster'],
   images: {
     remotePatterns: [

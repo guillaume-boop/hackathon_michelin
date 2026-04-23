@@ -21,11 +21,11 @@ export default async function EditRestaurantPage({ params }: { params: { id: str
         <Link href="/admin/restaurants" className="text-white/40 hover:text-white text-sm transition-colors">
           ← Restaurants
         </Link>
-        <h1 className="text-2xl font-black tracking-tight mt-3">Edit Restaurant</h1>
+        <h1 className="text-2xl font-black tracking-tight mt-3">Modifier le restaurant</h1>
         <p className="text-white/40 text-sm mt-1">{restaurant.name}</p>
       </div>
       <div className="bg-neutral-900 rounded-2xl border border-white/10 p-6">
-        <RestaurantForm action={action} defaultValues={restaurant} submitLabel="Save changes" />
+        <RestaurantForm action={action} defaultValues={restaurant} submitLabel="Enregistrer" />
       </div>
     </div>
   )

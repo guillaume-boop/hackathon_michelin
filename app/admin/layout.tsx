@@ -24,7 +24,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         </nav>
         <div className="mt-auto px-2">
           <div className="text-xs text-white/30 leading-relaxed">
-            Signed in as<br />
+            Connecté en tant que<br />
             <span className="text-white/50 font-medium">{user.username}</span>
           </div>
         </div>

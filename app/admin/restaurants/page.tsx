@@ -1,11 +1,12 @@
 import { supabaseAdmin } from '@/lib/supabase'
 import Link from 'next/link'
 import { deleteRestaurant } from '../actions'
+import { XRP_EXPLORER } from '@/lib/xrp'
 
 export default async function AdminRestaurantsPage() {
   const { data: restaurants } = await supabaseAdmin
     .from('restaurants')
-    .select('id, name, city, country, michelin_stars, green_stars, dietary_option')
+    .select('id, name, city, country, michelin_stars, green_stars, dietary_option, xrp_tx_hash')
     .order('name')
 
   return (
@@ -13,13 +14,13 @@ export default async function AdminRestaurantsPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-black tracking-tight">Restaurants</h1>
-          <p className="text-white/40 text-sm mt-1">{restaurants?.length ?? 0} establishments</p>
+          <p className="text-white/40 text-sm mt-1">{restaurants?.length ?? 0} établissement{(restaurants?.length ?? 0) > 1 ? 's' : ''}</p>
         </div>
         <Link
           href="/admin/restaurants/new"
           className="bg-[#E4002B] hover:bg-red-700 text-white font-semibold px-4 py-2.5 rounded-xl text-sm transition-colors"
         >
-          + Add restaurant
+          + Ajouter un restaurant
         </Link>
       </div>
 
@@ -27,11 +28,12 @@ export default async function AdminRestaurantsPage() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-white/10">
-              <th className="text-left px-5 py-3.5 text-xs font-semibold text-white/40 uppercase tracking-wide">Name</th>
-              <th className="text-left px-5 py-3.5 text-xs font-semibold text-white/40 uppercase tracking-wide">Location</th>
-              <th className="text-left px-5 py-3.5 text-xs font-semibold text-white/40 uppercase tracking-wide">Stars</th>
-              <th className="text-left px-5 py-3.5 text-xs font-semibold text-white/40 uppercase tracking-wide">Green</th>
-              <th className="text-left px-5 py-3.5 text-xs font-semibold text-white/40 uppercase tracking-wide">Dietary</th>
+              <th className="text-left px-5 py-3.5 text-xs font-semibold text-white/40 uppercase tracking-wide">Nom</th>
+              <th className="text-left px-5 py-3.5 text-xs font-semibold text-white/40 uppercase tracking-wide">Localisation</th>
+              <th className="text-left px-5 py-3.5 text-xs font-semibold text-white/40 uppercase tracking-wide">Étoiles</th>
+              <th className="text-left px-5 py-3.5 text-xs font-semibold text-white/40 uppercase tracking-wide">Vert</th>
+              <th className="text-left px-5 py-3.5 text-xs font-semibold text-white/40 uppercase tracking-wide">Régime</th>
+              <th className="text-left px-5 py-3.5 text-xs font-semibold text-white/40 uppercase tracking-wide">Blockchain</th>
               <th className="px-5 py-3.5" />
             </tr>
           </thead>
@@ -47,24 +49,38 @@ export default async function AdminRestaurantsPage() {
                 </td>
                 <td className="px-5 py-4">
                   {r.green_stars
-                    ? <span className="text-green-400 text-xs font-semibold">🌿 Yes</span>
+                    ? <span className="text-green-400 text-xs font-semibold">🌿 Oui</span>
                     : <span className="text-white/20">—</span>}
                 </td>
                 <td className="px-5 py-4 text-white/50 capitalize">{r.dietary_option ?? '—'}</td>
+                <td className="px-5 py-4">
+                  {r.xrp_tx_hash ? (
+                    <a
+                      href={`${XRP_EXPLORER}/${r.xrp_tx_hash}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-blue-950/60 hover:bg-blue-900/60 text-blue-400 text-xs font-medium transition-colors"
+                    >
+                      XRP ↗
+                    </a>
+                  ) : (
+                    <span className="text-white/20">—</span>
+                  )}
+                </td>
                 <td className="px-5 py-4">
                   <div className="flex items-center gap-2 justify-end">
                     <Link
                       href={`/admin/restaurants/${r.id}/edit`}
                       className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-medium transition-colors"
                     >
-                      Edit
+                      Modifier
                     </Link>
                     <form action={deleteRestaurant.bind(null, r.id)}>
                       <button
                         type="submit"
                         className="px-3 py-1.5 rounded-lg bg-red-950/60 hover:bg-red-900/60 text-[#E4002B] text-xs font-medium transition-colors"
                       >
-                        Delete
+                        Supprimer
                       </button>
                     </form>
                   </div>
@@ -74,7 +90,7 @@ export default async function AdminRestaurantsPage() {
             {!restaurants?.length && (
               <tr>
                 <td colSpan={6} className="px-5 py-12 text-center text-white/30 text-sm">
-                  No restaurants yet. Add your first one.
+                  Aucun restaurant. Ajoutez le premier.
                 </td>
               </tr>
             )}

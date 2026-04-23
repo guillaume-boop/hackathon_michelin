@@ -9,11 +9,11 @@ export default function NewRestaurantPage() {
         <Link href="/admin/restaurants" className="text-white/40 hover:text-white text-sm transition-colors">
           ← Restaurants
         </Link>
-        <h1 className="text-2xl font-black tracking-tight mt-3">New Restaurant</h1>
-        <p className="text-white/40 text-sm mt-1">Add a new establishment to the guide.</p>
+        <h1 className="text-2xl font-black tracking-tight mt-3">Nouveau restaurant</h1>
+        <p className="text-white/40 text-sm mt-1">Ajouter un nouvel établissement au guide.</p>
       </div>
       <div className="bg-neutral-900 rounded-2xl border border-white/10 p-6">
-        <RestaurantForm action={createRestaurant} submitLabel="Create restaurant" />
+        <RestaurantForm action={createRestaurant} submitLabel="Créer le restaurant" />
       </div>
     </div>
   )
