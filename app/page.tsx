@@ -11,8 +11,9 @@ import type { FeedPostWithRestaurant } from '@/types/FeedPost'
 
 export default function FeedPage() {
   const { data: session } = useSession()
-  const [posts, setPosts] = useState<FeedPostWithRestaurant[]>([])
+  const [posts, setPosts] = useState<(FeedPostWithRestaurant | null)[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [filter, setFilter] = useState<number | null>(null)
   const [activeIndex, setActiveIndex] = useState(0)
   const [showAuthGate, setShowAuthGate] = useState(false)
@@ -20,37 +21,183 @@ export default function FeedPage() {
   const [muted, setMuted] = useState(true)
   const [viewMode, setViewMode] = useState<'single' | 'grid'>('single')
   const containerRef = useRef<HTMLDivElement>(null)
+  const gridCacheRef = useRef<HTMLDivElement>(null)
+  const loaderRef = useRef<HTMLDivElement>(null) // Ref pour le loader observable
 
-  const fetchFeed = useCallback(async () => {
+  // Queue system to prevent multiple simultaneous fetches
+  const isFetchingRef = useRef(false)
+  const shouldFetchMoreRef = useRef(false)
+  const fetchedIndicesRef = useRef<Set<number>>(new Set()) // Track which indices have been fetched
+  const pendingTimeoutsRef = useRef<Map<number, NodeJS.Timeout>>(new Map()) // Track pending fetch timeouts
+  const pendingAbortControllersRef = useRef<Map<number, AbortController>>(new Map()) // Track pending fetches to abort
+
+  const BATCH_SIZE = 5
+  const GRID_ITEMS_TO_DISPLAY = 20 // Display 20 items in grid before needing to scroll for more
+  const LOAD_DELAY = 200 // Small delay to avoid blocking infinite scroll but still fast
+  const MIN_SCROLL_INTERVAL = 800 // Scroll lock (0.8 seconds between videos)
+
+  const fetchPostAtIndex = useCallback(async (idx: number) => {
+    // Don't fetch if already fetched or currently fetching
+    if (fetchedIndicesRef.current.has(idx)) return
+    if (isFetchingRef.current && !pendingAbortControllersRef.current.has(idx)) return // Skip if another is fetching (unless this is a preload)
+
+    isFetchingRef.current = true
+    
+    // Create an AbortController for this fetch
+    const abortController = new AbortController()
+    pendingAbortControllersRef.current.set(idx, abortController)
+    
     try {
-      const res = await fetch('/api/feed?limit=50')
+      // Fetch just this one post with abort signal
+      const res = await fetch(`/api/feed?limit=1&offset=${idx}`, {
+        signal: abortController.signal
+      })
       const data = await res.json()
-      setPosts(Array.isArray(data) ? data : [])
+      const newPost = Array.isArray(data) ? data[0] : null
+
+      if (newPost) {
+        console.log(`✓ Fetched video ${idx}`)
+        // Insert at correct position or update if exists
+        setPosts(prev => {
+          const updated = [...prev]
+          while (updated.length <= idx) {
+            updated.push(null as FeedPostWithRestaurant | null) // Fill gaps with null temporarily
+          }
+          updated[idx] = newPost
+          return updated
+        })
+      } else {
+        console.log(`✗ No video at index ${idx}`)
+      }
+      // Mark as fetched even if it failed (to avoid infinite retries)
+      fetchedIndicesRef.current.add(idx)
+    } catch (error) {
+      // Only log if it's not an abort error
+      if (error instanceof Error && error.name !== 'AbortError') {
+        console.error(`Failed to fetch post at index ${idx}:`, error)
+        // Still mark as fetched even on error so we don't retry infinitely
+        fetchedIndicesRef.current.add(idx)
+      }
     } finally {
-      setLoading(false)
+      setLoadingMore(false)
+      isFetchingRef.current = false
+      pendingAbortControllersRef.current.delete(idx)
     }
   }, [])
 
-  useEffect(() => { fetchFeed() }, [fetchFeed])
+  // Initial load: fetch first batch
+  useEffect(() => {
+    const fetchInitial = async () => {
+      try {
+        const res = await fetch(`/api/feed?limit=20&offset=0`)
+        const data = await res.json()
+        const newPosts = Array.isArray(data) ? data : []
+        setPosts(newPosts)
+        // Mark indices 0-19 as fetched
+        newPosts.forEach((_, i) => fetchedIndicesRef.current.add(i))
+        setLoading(false)
+      } catch (error) {
+        console.error('Failed to fetch initial posts:', error)
+        setLoading(false)
+      }
+    }
+    fetchInitial()
+  }, [])
+
+  // Auto-fetch more when approaching the end of loaded posts
+  useEffect(() => {
+    if (viewMode === 'single' && activeIndex > 0) {
+      // When user is close to the end, fetch more
+      if (activeIndex > posts.length - RENDER_RANGE - 2 && posts.length < 200) {
+        const nextIdx = posts.length
+        if (!fetchedIndicesRef.current.has(nextIdx) && !isFetchingRef.current) {
+          fetchPostAtIndex(nextIdx)
+        }
+      }
+    }
+  }, [activeIndex, viewMode, posts.length, fetchPostAtIndex])
 
   const filteredPosts = filter === null
     ? posts
     : filter === -1
-      ? posts.filter(p => p.restaurants?.green_stars)
-      : posts.filter(p => p.restaurants?.michelin_stars === filter)
+      ? posts.filter(p => p !== null && p.restaurants?.green_stars)
+      : posts.filter(p => p !== null && p.restaurants?.michelin_stars === filter)
 
-  // Track active card for video play/pause
+  // Render window: only render posts within a range of active index
+  // This prevents rendering 100+ videos at once
+  const RENDER_RANGE = 20 // Render all initially loaded posts to ensure they're available
+  const renderStart = Math.max(0, activeIndex - RENDER_RANGE)
+  const renderEnd = Math.min(filteredPosts.length, activeIndex + RENDER_RANGE + 1)
+  const visiblePosts = filteredPosts.slice(renderStart, renderEnd)
+  const postsBeforeRender = renderStart
+
+  // Track active card for video play/pause & handle infinite scroll
   useEffect(() => {
     const container = containerRef.current
-    if (!container || filteredPosts.length === 0 || viewMode === 'grid') return
+    const gridContainer = gridCacheRef.current
+    const loader = loaderRef.current
+    
+    if (!container || filteredPosts.length === 0) return
 
-    const items = container.querySelectorAll<HTMLElement>('.feed-item')
-    const observer = new IntersectionObserver(
+    // Single view: track active index and fetch if needed
+    if (viewMode === 'single') {
+      const scrollContainer = container.querySelector('.relative.w-full') as HTMLElement
+      const items = container.querySelectorAll<HTMLElement>('.feed-item')
+      let scrollTimeout: NodeJS.Timeout | null = null
+      let lastActiveChangedTime = Date.now()
+      
+      // Capture refs into local variables for cleanup function
+      const pendingTimeouts = pendingTimeoutsRef.current
+      const pendingAbortControllers = pendingAbortControllersRef.current
+      
+      const handleWheel = (e: WheelEvent) => {
+        const now = Date.now()
+        const timeSinceLastChange = now - lastActiveChangedTime
+        
+        // Block scroll if user hasn't waited MIN_SCROLL_INTERVAL
+        if (timeSinceLastChange < MIN_SCROLL_INTERVAL) {
+          e.preventDefault()
+        }
+      }
+      
+      const observer = new IntersectionObserver(
       entries => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
             const idx = parseInt((entry.target as HTMLElement).dataset.index ?? '0', 10)
-            setActiveIndex(idx)
+            
+            // Throttle: max one video change per MIN_SCROLL_INTERVAL
+            // Clear any previous timeout and set a new one
+            if (scrollTimeout) clearTimeout(scrollTimeout)
+            
+            scrollTimeout = setTimeout(() => {
+              setActiveIndex(idx)
+              lastActiveChangedTime = Date.now()
+              
+              // Cancel any pending timeouts for other indices
+              pendingTimeoutsRef.current.forEach((timeout, timeoutIdx) => {
+                if (timeoutIdx !== idx) {
+                  clearTimeout(timeout)
+                  pendingTimeoutsRef.current.delete(timeoutIdx)
+                }
+              })
+              
+              // If already fetched or fetching, skip
+              if (fetchedIndicesRef.current.has(idx) || isFetchingRef.current) return
+              
+              // Set a timer to fetch after LOAD_DELAY
+              if (pendingTimeoutsRef.current.has(idx)) {
+                clearTimeout(pendingTimeoutsRef.current.get(idx)!)
+              }
+              
+              const timeout = setTimeout(() => {
+                fetchPostAtIndex(idx)
+                pendingTimeoutsRef.current.delete(idx)
+              }, LOAD_DELAY)
+              
+              pendingTimeoutsRef.current.set(idx, timeout)
+            }, MIN_SCROLL_INTERVAL)
+            
             break
           }
         }
@@ -58,8 +205,69 @@ export default function FeedPage() {
       { root: container, threshold: 0.7 },
     )
     items.forEach(el => observer.observe(el))
-    return () => observer.disconnect()
-  }, [filteredPosts, viewMode])
+    
+    // Add wheel listener to block fast scrolling (non-passive so we can preventDefault)
+    if (scrollContainer) {
+      scrollContainer.addEventListener('wheel', handleWheel, { passive: false })
+    }
+    
+    // Observe the loader to trigger fetches for scrolling down
+    const loaderObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !isFetchingRef.current) {
+          // Loader is visible - fetch more
+          const nextIdx = posts.length
+          if (!fetchedIndicesRef.current.has(nextIdx)) {
+            setLoadingMore(true)
+            fetchPostAtIndex(nextIdx)
+          }
+        }
+      })
+    }, { threshold: 0.1 })  // No root container - observe viewport
+    
+    // Always observe loader even if it's initially null - it might appear later
+    if (loader) {
+      loaderObserver.observe(loader)
+    }
+    
+    return () => {
+      observer.disconnect()
+      loaderObserver.disconnect()
+      if (scrollTimeout) clearTimeout(scrollTimeout)
+      if (scrollContainer) {
+        scrollContainer.removeEventListener('wheel', handleWheel)
+      }
+      // Clean up all pending timeouts when unmounting
+      pendingTimeouts.forEach(timeout => clearTimeout(timeout))
+      pendingTimeouts.clear()
+      // Abort all pending fetches when unmounting
+      pendingAbortControllers.forEach(controller => controller.abort())
+      pendingAbortControllers.clear()
+    }
+    } else if (viewMode === 'grid' && gridContainer) {
+      // Grid view: track scroll and load more at bottom
+      // NO throttle for grid - just load on demand
+      const handleScroll = () => {
+        const scrollTop = gridContainer.scrollTop
+        const scrollHeight = gridContainer.scrollHeight
+        const clientHeight = gridContainer.clientHeight
+        
+        // Load more when user scrolls near bottom
+        if (scrollHeight - (scrollTop + clientHeight) < 500) {
+          // Fetch next post without any timeout
+          const nextIdx = posts.length
+          if (!fetchedIndicesRef.current.has(nextIdx) && !isFetchingRef.current) {
+            fetchPostAtIndex(nextIdx)
+          }
+        }
+      }
+      
+      gridContainer.addEventListener('scroll', handleScroll)
+      return () => {
+        gridContainer.removeEventListener('scroll', handleScroll)
+      }
+    }
+  }, [filteredPosts, viewMode, fetchPostAtIndex, posts.length, MIN_SCROLL_INTERVAL])
 
   useEffect(() => {
     if (viewMode === 'single') {
@@ -366,18 +574,36 @@ export default function FeedPage() {
               </div>
             ) : (
               <>
-                <div className="relative w-full h-full overflow-y-scroll snap-y snap-mandatory" style={{ scrollbarWidth: 'none' }}>
-                  {filteredPosts.map((post, i) => (
-                    <div key={post.id} className="feed-item" data-index={i}>
+                <div className="relative w-full h-full overflow-y-scroll snap-y snap-mandatory" style={{ scrollbarWidth: 'none', scrollBehavior: 'smooth' }}>
+                  {/* Spacer before visible range */}
+                  {postsBeforeRender > 0 && (
+                    <div className="h-[100dvh]" />
+                  )}
+                  
+                  {/* Rendered posts (only visible window) */}
+                  {visiblePosts.filter(p => p !== null).map((post, i) => (
+                    <div key={post.id} className="feed-item snap-start" data-index={renderStart + i} style={{ height: '100dvh' }}>
                       <VideoCard
                         post={post}
-                        isActive={i === activeIndex}
+                        isActive={renderStart + i === activeIndex}
                         muted={muted}
                         onAuthRequired={() => setShowAuthGate(true)}
                         sessionUserId={session?.user?.id}
                       />
                     </div>
                   ))}
+                  
+                  {/* Spacer after visible range */}
+                  {renderEnd < filteredPosts.length && (
+                    <div style={{ height: `${(filteredPosts.length - renderEnd) * 100}dvh` }} />
+                  )}
+                  
+                  {/* Loader - always have extra space so it's always scrollable */}
+                  <div ref={loaderRef} style={{ minHeight: '200dvh' }} className="flex items-center justify-center py-20">
+                    {loadingMore && (
+                      <div className="w-8 h-8 border-2 border-gray-300 dark:border-white/20 border-t-gray-900 dark:border-t-white rounded-full animate-spin" />
+                    )}
+                  </div>
                 </div>
                 
                 {/* Pagination Dots */}
@@ -403,7 +629,7 @@ export default function FeedPage() {
       </>
     ) : (
       /* Grid View (2xl+) */
-      <div className="w-full h-full overflow-y-auto p-4 xl:p-6 2xl:p-8 bg-white dark:bg-black">
+      <div ref={gridCacheRef} className="w-full h-full overflow-y-auto p-4 xl:p-6 2xl:p-8 bg-white dark:bg-black">
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <div className="w-10 h-10 border-2 border-gray-300 dark:border-white/20 border-t-gray-900 dark:border-t-white rounded-full animate-spin" />
@@ -416,19 +642,27 @@ export default function FeedPage() {
             <p className="text-gray-500 dark:text-white/60">Aucun contenu</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 xl:gap-6 auto-rows-max max-w-[1600px] mx-auto">
-            {filteredPosts.map((post, i) => (
-              <div key={post.id} className="h-[500px] xl:h-[600px] 2xl:h-[650px] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow">
-                <VideoCard
-                  post={post}
-                  isActive={true}
-                  muted={muted}
-                  onAuthRequired={() => setShowAuthGate(true)}
-                  sessionUserId={session?.user?.id}
-                />
+          <>
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 xl:gap-6 auto-rows-max max-w-[1600px] mx-auto">
+              {filteredPosts.filter(p => p !== null).map((post, i) => (
+                <div key={post.id} className="h-[500px] xl:h-[600px] 2xl:h-[650px] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow">
+                  <VideoCard
+                    post={post}
+                    isActive={true}
+                    muted={muted}
+                    onAuthRequired={() => setShowAuthGate(true)}
+                    sessionUserId={session?.user?.id}
+                  />
+                </div>
+              ))}
+            </div>
+            
+            {loadingMore && (
+              <div className="flex items-center justify-center py-8">
+                <div className="w-8 h-8 border-2 border-gray-300 dark:border-white/20 border-t-gray-900 dark:border-t-white rounded-full animate-spin" />
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
       </div>
     )}

@@ -70,21 +70,46 @@ export default function VideoCard({ post, isActive, muted, onAuthRequired, sessi
     3: 'from-red-800 to-black',
   }
 
-  const posterSeed = post.id.replace(/-/g, '').slice(0, 8)
-  const posterUrl = `https://picsum.photos/seed/${posterSeed}/400/700`
+  // Générer une couleur déterministe basée sur le nom du restaurant
+  const restaurantInitial = (post.restaurants?.name?.[0] ?? '?').toUpperCase()
+  const getColorFromRestaurant = (name: string) => {
+    const colors = ['#E4002B', '#C41E3A', '#D91E63', '#9C27B0', '#673AB7', '#3F51B5']
+    const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
+    return colors[hash % colors.length]
+  }
+  const restaurantColor = getColorFromRestaurant(post.restaurants?.name ?? '')
+
+  // Fallback: gradient sombre + initiale du restaurant
+  const posterUrl = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 700'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23222;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23000;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='400' height='700' fill='url(%23grad)'/%3E%3C/svg%3E`
 
   return (
     <div className="relative w-full h-full bg-black overflow-hidden select-none">
 
-      {/* Poster pendant le chargement */}
-      {post.content_url && !videoError && (
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${posterUrl})` }} />
-      )}
-      {post.content_url && !videoError && !videoReady && (
-        <div className="absolute inset-0 bg-black/40" />
+      {/* Background placeholder - toujours visible, disparaît quand vidéo prête */}
+      {!videoReady && (
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center z-10">
+          <div className="flex flex-col items-center justify-center gap-4">
+            {/* Grand logo du restaurant */}
+            <div 
+              className="text-9xl font-bold opacity-30 animate-pulse"
+              style={{ color: restaurantColor }}
+            >
+              {restaurantInitial}
+            </div>
+            {/* Nom du restaurant */}
+            <p className="text-white/60 text-lg font-semibold text-center max-w-xs">
+              {post.restaurants?.name}
+            </p>
+            {/* Loading indicator avec texte */}
+            <div className="mt-4 flex flex-col items-center gap-2">
+              <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+              <p className="text-white/50 text-xs font-medium tracking-wide">Chargement...</p>
+            </div>
+          </div>
+        </div>
       )}
 
-      {/* Vidéo full-screen ou gradient fallback */}
+      {/* Vidéo par-dessus le placeholder */}
       {post.content_url && !videoError ? (
         <video
           ref={videoRef}
@@ -93,7 +118,7 @@ export default function VideoCard({ post, isActive, muted, onAuthRequired, sessi
           loop
           muted={muted}
           playsInline
-          preload="auto"
+          preload="none"
           onCanPlay={() => setVideoReady(true)}
           onError={() => setVideoError(true)}
         />
