@@ -233,14 +233,16 @@ async function seedLocations(users: { id: string }[]) {
 
 async function seedRestaurantVideos(restaurants: { id: string; name: string }[]) {
   console.log('🎬 Insertion des vidéos restaurants…')
-  const videos = restaurants.slice(0, 5).map((restaurant, i) => ({
-    restaurant_id: restaurant.id,
-    url: DEMO_VIDEOS[i] ?? DEMO_VIDEOS[0],
-    title: `Dans les cuisines de ${restaurant.name}`,
-    order: 1,
-  }))
+  const FEED_BASE_URL = 'https://pplmaklememeytkghcgc.supabase.co/storage/v1/object/public/feed'
+  const videos = restaurants.flatMap((restaurant) =>
+    Array.from({ length: 5 }).map((_, i) => ({
+      restaurant_id: restaurant.id,
+      url: `${FEED_BASE_URL}/feed${i + 1}.mov`,
+      order: i + 1,
+    }))
+  )
   await supabase.from('restaurant_videos').insert(videos)
-  console.log(`  ✓ ${videos.length} vidéos restaurant`)
+  console.log(`  ✓ ${videos.length} vidéos restaurant (${videos.length / restaurants.length} par restaurant)`)
 }
 
 async function main() {
