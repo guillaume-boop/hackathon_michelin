@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import { supabaseAdmin } from '@/lib/supabase'
 import Link from 'next/link'
 import { deleteRestaurant } from '../actions'

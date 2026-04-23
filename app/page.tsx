@@ -267,7 +267,7 @@ export default function FeedPage() {
         gridContainer.removeEventListener('scroll', handleScroll)
       }
     }
-  }, [filteredPosts, viewMode, fetchPostAtIndex, posts.length, MIN_SCROLL_INTERVAL])
+  }, [filteredPosts, viewMode, fetchPostAtIndex, posts.length, MIN_SCROLL_INTERVAL, activeIndex, videoReadyMap])
 
   useEffect(() => {
     if (viewMode === 'single') {
