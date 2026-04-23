@@ -161,7 +161,7 @@ export default function DecouvrirPage() {
       {/* ── Search bar ───────────────────────────── */}
       {!hasActiveFilters && (
         <div className={`sticky top-0 z-20 backdrop-blur-xl px-4 pt-14 pb-4 ${isLight ? 'bg-[#F5F5F5]/95' : 'bg-black/95'}`}>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <button
               onClick={() => { setQuery(''); setFilters(DEFAULT_FILTERS); setPendingFilters(DEFAULT_FILTERS) }}
               className={`flex-shrink-0 transition-opacity ${query ? 'opacity-60 hover:opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
@@ -170,7 +170,7 @@ export default function DecouvrirPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            <div className={`flex-1 flex items-center gap-1.5 rounded-2xl pr-4 py-3.5 border ${isLight ? 'bg-white border-black/[0.07]' : 'bg-neutral-900 border-white/[0.06]'}`}>
+            <div className={`flex-1 flex items-center gap-2 rounded-2xl pl-3 pr-3 py-2.5 border ${isLight ? 'bg-white border-black/[0.07]' : 'bg-neutral-900 border-white/[0.06]'}`}>
               <svg viewBox="0 0 24 24" fill="none" stroke={iconStroke} strokeWidth={1.5} className="w-4 h-4 opacity-40 flex-shrink-0">
                 <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
               </svg>
@@ -180,7 +180,7 @@ export default function DecouvrirPage() {
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 placeholder="Restaurant, chef, ville…"
-                className={`flex-1 bg-transparent text-sm outline-none h-6 ${isLight ? 'text-[#262626] placeholder:text-black/30' : 'text-white placeholder:text-white/30'}`}
+                className={`flex-1 bg-transparent text-sm outline-none ${isLight ? 'text-[#262626] placeholder:text-black/30' : 'text-white placeholder:text-white/30'}`}
               />
               {query && (
                 <button onClick={() => setQuery('')} className="opacity-40 active:opacity-100">
