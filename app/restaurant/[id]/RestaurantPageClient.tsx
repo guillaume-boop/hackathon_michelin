@@ -276,22 +276,67 @@ export default function RestaurantPageClient({ restaurant, chefs, posts, menuDis
 
         {/* ── Petits plus ─────────────────────── */}
         {(() => {
-          const facilities = restaurant.facilities
-          const facilitiesArray = Array.isArray(facilities) ? facilities : typeof facilities === 'string' ? facilities.split(',').map(f => f.trim()) : []
-          return facilitiesArray.length > 0 ? (
-            <div className="mx-4 mt-8">
-              <p className={`${sectionTitle} mb-3`}>Petits plus :</p>
-              <div className="grid grid-cols-4 gap-2">
-                {facilitiesArray.map((facility) => (
-                  <div key={facility} className={`flex flex-col items-center gap-1.5 py-3 px-1 rounded-xl border ${cardBg}`}>
-                    <span className="text-xl">{FACILITY_ICONS[facility] ?? '✨'}</span>
-                    <span className={`text-[10px] text-center leading-tight font-normal ${sub}`}>{facility}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : null
-        })()}
+  const facilities = restaurant.facilities
+  const facilitiesArray = Array.isArray(facilities) ? facilities : typeof facilities === 'string' ? facilities.split(',').map(f => f.trim()) : []
+  
+  // Fonction pour obtenir le chemin de l'icône SVG
+  const getFacilityIcon = (facility: string) => {
+    const facilityLower = facility.toLowerCase()
+    
+    if (facilityLower.includes('air conditioning') || facilityLower.includes('climatisation')) {
+      return '/svg/air-conditioning.png'
+    }
+    if (facilityLower.includes('wine list') || facilityLower.includes('carte des vins')) {
+      return '/svg/wine-list.png'
+    }
+    if (facilityLower.includes('terrace') || facilityLower.includes('terrasse')) {
+      return '/svg/terrace.png'
+    }
+    // if (facilityLower.includes('parking')) {
+    //   return '/svg/parking.png'
+    // }
+    // if (facilityLower.includes('wifi')) {
+    //   return '/svg/wifi.png'
+    // }
+    // if (facilityLower.includes('wheelchair') || facilityLower.includes('fauteuil')) {
+    //   return '/svg/wheelchair.png'
+    // }
+    // if (facilityLower.includes('pets') || facilityLower.includes('animaux')) {
+    //   return '/svg/pets.svg'
+    // }
+    // if (facilityLower.includes('delivery') || facilityLower.includes('livraison')) {
+    //   return '/svg/delivery.svg'
+    // }
+    // if (facilityLower.includes('takeaway') || facilityLower.includes('emporter')) {
+    //   return '/svg/takeaway.svg'
+    // }
+    
+    // Icône par défaut
+    return '/svg/default.svg'
+  }
+  
+  return facilitiesArray.length > 0 ? (
+    <div className="mx-4 mt-8">
+      <p className={`${sectionTitle} mb-3`}>Petits plus :</p>
+      <div className="grid grid-cols-4 gap-2">
+        {facilitiesArray.map((facility) => (
+          <div key={facility} className={`flex flex-col items-center gap-1.5 py-3 px-1 rounded-xl ${cardBg}`}>
+            <img 
+              src={getFacilityIcon(facility)}
+              alt={facility}
+              className="w-6 h-6 object-contain"
+              onError={(e) => {
+                // Si l'image n'existe pas, utiliser l'icône par défaut
+                (e.target as HTMLImageElement).src = '/svg/default.svg'
+              }}
+            />
+            <span className={`text-[10px] text-center leading-tight font-normal ${sub}`}>{facility}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  ) : null
+})()}
 
         {/* ── Chefs ─────────────────────────────── */}
         {chefs.length > 0 && (
