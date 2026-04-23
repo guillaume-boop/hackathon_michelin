@@ -3,18 +3,43 @@ import Link from 'next/link'
 import { deleteRestaurant } from '../actions'
 import { XRP_EXPLORER } from '@/lib/xrp'
 
-export default async function AdminRestaurantsPage() {
-  const { data: restaurants } = await supabaseAdmin
+export const dynamic = 'force-dynamic'
+
+const PAGE_SIZE = 50
+
+export default async function AdminRestaurantsPage({
+  searchParams,
+}: {
+  searchParams: { q?: string; page?: string }
+}) {
+  const q = searchParams.q?.trim() ?? ''
+  const page = Math.max(1, parseInt(searchParams.page ?? '1', 10))
+  const from = (page - 1) * PAGE_SIZE
+  const to = from + PAGE_SIZE - 1
+
+  let query = supabaseAdmin
     .from('restaurants')
-    .select('id, name, city, country, michelin_stars, green_stars, dietary_option, xrp_tx_hash')
+    .select('id, name, city, country, michelin_stars, green_stars, dietary_option, xrp_tx_hash', { count: 'exact' })
     .order('name')
+    .range(from, to)
+
+  if (q) query = query.ilike('name', `%${q}%`)
+
+  const { data: restaurants, error, count } = await query
+
+  if (error) console.error('[admin/restaurants] erreur:', error.message)
+
+  const totalPages = Math.ceil((count ?? 0) / PAGE_SIZE)
 
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-black tracking-tight">Restaurants</h1>
-          <p className="text-white/40 text-sm mt-1">{restaurants?.length ?? 0} établissement{(restaurants?.length ?? 0) > 1 ? 's' : ''}</p>
+          <p className="text-white/40 text-sm mt-1">
+            {count?.toLocaleString('fr-FR') ?? 0} établissement{(count ?? 0) > 1 ? 's' : ''}
+            {q && <span className="ml-1">· recherche "{q}"</span>}
+          </p>
         </div>
         <Link
           href="/admin/restaurants/new"
@@ -23,6 +48,16 @@ export default async function AdminRestaurantsPage() {
           + Ajouter un restaurant
         </Link>
       </div>
+
+      {/* Barre de recherche */}
+      <form method="GET" className="mb-5">
+        <input
+          name="q"
+          defaultValue={q}
+          placeholder="Rechercher par nom…"
+          className="w-full max-w-sm bg-neutral-900 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/25 focus:outline-none focus:border-white/30 transition-colors"
+        />
+      </form>
 
       <div className="bg-neutral-900 rounded-2xl border border-white/10 overflow-hidden">
         <table className="w-full text-sm">
@@ -89,14 +124,39 @@ export default async function AdminRestaurantsPage() {
             ))}
             {!restaurants?.length && (
               <tr>
-                <td colSpan={6} className="px-5 py-12 text-center text-white/30 text-sm">
-                  Aucun restaurant. Ajoutez le premier.
+                <td colSpan={7} className="px-5 py-12 text-center text-white/30 text-sm">
+                  {q ? `Aucun résultat pour "${q}".` : 'Aucun restaurant.'}
                 </td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between mt-5 text-sm text-white/40">
+          <span>Page {page} sur {totalPages}</span>
+          <div className="flex gap-2">
+            {page > 1 && (
+              <Link
+                href={`?q=${q}&page=${page - 1}`}
+                className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 transition-colors"
+              >
+                ← Précédent
+              </Link>
+            )}
+            {page < totalPages && (
+              <Link
+                href={`?q=${q}&page=${page + 1}`}
+                className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 transition-colors"
+              >
+                Suivant →
+              </Link>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

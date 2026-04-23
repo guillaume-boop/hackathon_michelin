@@ -1,6 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  serverExternalPackages: ['xrpl'],
+  serverExternalPackages: ['xrpl', 'ws', 'bufferutil', 'utf-8-validate'],
+  webpack: (config) => {
+    config.externals.push('bufferutil', 'utf-8-validate')
+    return config
+  },
   transpilePackages: ['leaflet', 'leaflet.markercluster'],
   images: {
     remotePatterns: [
