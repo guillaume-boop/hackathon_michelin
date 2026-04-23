@@ -22,12 +22,10 @@ export async function createRestaurant(formData: FormData) {
   const { data, error } = await supabaseAdmin.from('restaurants').insert(payload).select('id').single()
   if (error) throw new Error(error.message)
 
-  try {
-    const txHash = await logRestaurantOnChain(payload)
-    await supabaseAdmin.from('restaurants').update({ xrp_tx_hash: txHash }).eq('id', data.id)
-  } catch {
-    // non-fatal: restaurant saved, blockchain log failed silently
-  }
+  // fire-and-forget — don't block the redirect
+  logRestaurantOnChain(payload)
+    .then((txHash) => supabaseAdmin.from('restaurants').update({ xrp_tx_hash: txHash }).eq('id', data.id))
+    .catch((err) => console.error('[xrp] échec du log on-chain:', err.message))
 
   revalidatePath('/admin/restaurants')
   redirect('/admin/restaurants')
