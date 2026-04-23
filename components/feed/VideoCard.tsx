@@ -121,10 +121,13 @@ export default function VideoCard({ post, isActive, muted, onAuthRequired, sessi
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
           src={post.content_url}
           loop
+          autoPlay
           muted={muted}
           playsInline
-          preload="metadata"
-          onCanPlay={() => setVideoReady(true)}
+          webkit-playsinline="true"
+          x-webkit-airplay="deny"
+          preload="auto"
+          onLoadedData={() => setVideoReady(true)}
           onError={() => setVideoError(true)}
         />
       ) : (

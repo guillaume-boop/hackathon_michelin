@@ -31,7 +31,7 @@ if (!SUPABASE_URL || !SERVICE_ROLE_KEY) {
 
 const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY)
 
-const VIDEO_URL = 'https://avtshare01.rz.tu-ilmenau.de/avt-vqdb-uhd-1/test_1/segments/bigbuck_bunny_8bit_7500kbps_1080p_60.0fps_h264.mp4'
+const VIDEO_URL = process.env.VIDEO_URL || 'https://www.w3schools.com/html/mov_bbb.mp4'
 
 const BATCH_SIZE = 50
 const POSTS_PER_RESTAURANT = 10
