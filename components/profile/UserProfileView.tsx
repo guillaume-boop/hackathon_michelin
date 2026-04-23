@@ -8,6 +8,8 @@ import BottomNav from '@/components/layout/BottomNav'
 import Stars from '@/components/ui/Stars'
 import CircleScore from '@/components/ui/CircleScore'
 import LoadingScreen from '@/components/ui/LoadingScreen'
+import { AnimatedSheet } from '@/components/sheets/AnimatedSheet'
+import { useTabAnimation } from '@/components/animations/useTabAnimation'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -65,6 +67,7 @@ export default function UserProfileView({ userId, isSelf, showBackButton = false
   const isLight = variant === 'light'
   const router = useRouter()
   const { data: session } = useSession()
+  const contentRef = useRef<HTMLDivElement>(null)
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [chefData, setChefData] = useState<ChefData | null>(null)
   const [experiences, setExperiences] = useState<Experience[]>([])
@@ -79,6 +82,8 @@ export default function UserProfileView({ userId, isSelf, showBackButton = false
   const [selected, setSelected] = useState<Experience | null>(null)
   const [selectedFeed, setSelectedFeed] = useState<ContentItem | null>(null)
   const [openVideo, setOpenVideo] = useState<string | null>(null)
+
+  useTabAnimation(tab, contentRef)
 
   useEffect(() => {
     Promise.all([
@@ -357,38 +362,44 @@ export default function UserProfileView({ userId, isSelf, showBackButton = false
       </div>
 
       {/* ── Contenu ──────────────────────────────────────────── */}
-      {tab === 'posts' && (
-        experiences.length === 0
-          ? <EmptyState emoji="🍽️" text="Aucune expérience" sub="Les visites de restaurants apparaîtront ici." />
-          : <ExperienceGrid experiences={experiences} onSelect={setSelected} />
-      )}
+      <div ref={contentRef}>
+        {tab === 'posts' && (
+          experiences.length === 0
+            ? <EmptyState text="Aucune expérience" sub="Les visites de restaurants apparaîtront ici." />
+            : <ExperienceGrid experiences={experiences} onSelect={setSelected} />
+        )}
 
-      {tab === 'likes' && (
-        liked.length === 0
-          ? <EmptyState icon={<HeartIconLg />} text="Aucun like" sub="Les posts et expériences aimés apparaîtront ici." />
-          : <ContentGrid items={liked} onSelect={handleItemSelect} />
-      )}
+        {tab === 'likes' && (
+          liked.length === 0
+            ? <EmptyState icon={<HeartIconLg />} text="Aucun like" sub="Les posts et expériences aimés apparaîtront ici." />
+            : <ContentGrid items={liked} onSelect={handleItemSelect} />
+        )}
 
-      {tab === 'saved' && (
-        saved.length === 0
-          ? <EmptyState icon={<BookmarkIconLg />} text="Aucun enregistrement" sub="Les posts sauvegardés apparaîtront ici." />
-          : <ContentGrid items={saved} onSelect={handleItemSelect} />
-      )}
+        {tab === 'saved' && (
+          saved.length === 0
+            ? <EmptyState icon={<BookmarkIconLg />} text="Aucun enregistrement" sub="Les posts sauvegardés apparaîtront ici." />
+            : <ContentGrid items={saved} onSelect={handleItemSelect} />
+        )}
+      </div>
 
       {/* ── Sheets ───────────────────────────────────────────── */}
-      {selected && (
-        <ExperienceSheet
-          exp={selected}
-          profile={profile}
-          avatarUrl={avatarUrl}
-          roleLabel={roleLabel}
-          onClose={() => setSelected(null)}
-        />
-      )}
+      <AnimatedSheet isOpen={!!selected} onClose={() => setSelected(null)}>
+        {selected && (
+          <ExperienceSheetContent
+            exp={selected}
+            profile={profile}
+            avatarUrl={avatarUrl}
+            roleLabel={roleLabel}
+            onClose={() => setSelected(null)}
+          />
+        )}
+      </AnimatedSheet>
 
-      {selectedFeed && (
-        <FeedSheet item={selectedFeed} onClose={() => setSelectedFeed(null)} />
-      )}
+      <AnimatedSheet isOpen={!!selectedFeed} onClose={() => setSelectedFeed(null)}>
+        {selectedFeed && (
+          <FeedSheetContent item={selectedFeed} onClose={() => setSelectedFeed(null)} />
+        )}
+      </AnimatedSheet>
 
       {openVideo && (
         <div className="fixed inset-0 z-50 bg-black" onClick={() => setOpenVideo(null)}>
@@ -401,9 +412,9 @@ export default function UserProfileView({ userId, isSelf, showBackButton = false
         </div>
       )}
 
-      {showMenu && (
-        <MenuSheet onClose={() => setShowMenu(false)} />
-      )}
+      <AnimatedSheet isOpen={showMenu} onClose={() => setShowMenu(false)}>
+        <MenuSheetContent onClose={() => setShowMenu(false)} />
+      </AnimatedSheet>
 
       {!selected && !selectedFeed && !openVideo && !showMenu && <BottomNav />}
     </div>
@@ -412,37 +423,34 @@ export default function UserProfileView({ userId, isSelf, showBackButton = false
 
 // ── Menu sheet (isSelf) ───────────────────────────────────────────────────────
 
-function MenuSheet({ onClose }: { onClose: () => void }) {
+function MenuSheetContent({ onClose }: { onClose: () => void }) {
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-neutral-950 rounded-t-3xl overflow-hidden">
-        <div className="flex justify-center pt-3 pb-1">
-          <div className="w-10 h-1 rounded-full bg-white/20" />
-        </div>
-        <div className="px-4 py-4 pb-10 flex flex-col gap-1">
-          <button
-            onClick={onClose}
-            className="flex items-center gap-3 px-4 py-4 rounded-2xl active:bg-white/5 transition-colors text-left"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={1.5} className="w-5 h-5 opacity-60">
-              <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />
-            </svg>
-            <span className="text-white/80 text-sm font-medium">Modifier le profil</span>
-          </button>
-          <div className="h-px bg-white/5 mx-4" />
-          <button
-            onClick={() => signOut({ callbackUrl: '/login' })}
-            className="flex items-center gap-3 px-4 py-4 rounded-2xl active:bg-white/5 transition-colors text-left"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={1.5} className="w-5 h-5 opacity-60">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
-            </svg>
-            <span className="text-white/80 text-sm font-medium">Se déconnecter</span>
-          </button>
-        </div>
+    <>
+      <div className="flex justify-center pt-3 pb-1">
+        <div className="w-10 h-1 rounded-full bg-white/20" />
       </div>
-    </div>
+      <div className="px-4 py-4 pb-10 flex flex-col gap-1">
+        <button
+          onClick={onClose}
+          className="flex items-center gap-3 px-4 py-4 rounded-2xl active:bg-white/5 transition-colors text-left"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={1.5} className="w-5 h-5 opacity-60">
+            <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />
+          </svg>
+          <span className="text-white/80 text-sm font-medium">Modifier le profil</span>
+        </button>
+        <div className="h-px bg-white/5 mx-4" />
+        <button
+          onClick={() => signOut({ callbackUrl: '/login' })}
+          className="flex items-center gap-3 px-4 py-4 rounded-2xl active:bg-white/5 transition-colors text-left"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={1.5} className="w-5 h-5 opacity-60">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+          </svg>
+          <span className="text-white/80 text-sm font-medium">Se déconnecter</span>
+        </button>
+      </div>
+    </>
   )
 }
 
@@ -527,7 +535,7 @@ function EmptyState({ emoji, icon, text, sub }: { emoji?: string; icon?: React.R
 
 // ── Experience bottom sheet ───────────────────────────────────────────────────
 
-function ExperienceSheet({
+function ExperienceSheetContent({
   exp, profile, avatarUrl, roleLabel, onClose,
 }: {
   exp: Experience
@@ -558,79 +566,76 @@ function ExperienceSheet({
     : likeCount > 0 ? `${likeCount} j'aime` : null
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-neutral-950 rounded-t-3xl overflow-hidden max-h-[88dvh] flex flex-col">
-        <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
-          <div className="w-10 h-1 rounded-full bg-white/20" />
+    <>
+      <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
+        <div className="w-10 h-1 rounded-full bg-white/20" />
+      </div>
+      <div className="overflow-y-auto">
+        <div className="flex items-center gap-3 px-4 py-3">
+          <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 bg-neutral-800">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-white font-bold text-sm">@{profile?.username}</p>
+            <p className="text-white/40 text-xs">{roleLabel}</p>
+          </div>
+          <button onClick={onClose} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={2} className="w-4 h-4">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
-        <div className="overflow-y-auto">
-          <div className="flex items-center gap-3 px-4 py-3">
-            <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 bg-neutral-800">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-white font-bold text-sm">@{profile?.username}</p>
-              <p className="text-white/40 text-xs">{roleLabel}</p>
-            </div>
-            <button onClick={onClose} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
-              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={2} className="w-4 h-4">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+        <div className="w-full aspect-square bg-cover bg-center" style={{ backgroundImage: `url(https://picsum.photos/seed/${seed}food/600/600)` }} />
+        <div className="px-4 py-3">
+          <div className="flex items-center gap-4 mb-2">
+            <button
+              onClick={() => {
+                const next = !liked
+                setLiked(next)
+                setLikeCount(c => next ? c + 1 : c - 1)
+                fetch(`/api/experiences/${exp.id}/like`, { method: next ? 'POST' : 'DELETE' })
+              }}
+              className="active:scale-90 transition-transform"
+            >
+              <svg viewBox="0 0 24 24" fill={liked ? '#E4002B' : 'none'} stroke={liked ? '#E4002B' : 'white'} strokeWidth={1.5} className="w-7 h-7">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+              </svg>
+            </button>
+            <button
+              onClick={() => {
+                const next = !saved
+                setSaved(next)
+                fetch(`/api/experiences/${exp.id}/bookmark`, { method: next ? 'POST' : 'DELETE' })
+              }}
+              className="active:scale-90 transition-transform"
+            >
+              <svg viewBox="0 0 24 24" fill={saved ? 'white' : 'none'} stroke="white" strokeWidth={1.5} className="w-7 h-7">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
               </svg>
             </button>
           </div>
-          <div className="w-full aspect-square bg-cover bg-center" style={{ backgroundImage: `url(https://picsum.photos/seed/${seed}food/600/600)` }} />
-          <div className="px-4 py-3">
-            <div className="flex items-center gap-4 mb-2">
-              <button
-                onClick={() => {
-                  const next = !liked
-                  setLiked(next)
-                  setLikeCount(c => next ? c + 1 : c - 1)
-                  fetch(`/api/experiences/${exp.id}/like`, { method: next ? 'POST' : 'DELETE' })
-                }}
-                className="active:scale-90 transition-transform"
-              >
-                <svg viewBox="0 0 24 24" fill={liked ? '#E4002B' : 'none'} stroke={liked ? '#E4002B' : 'white'} strokeWidth={1.5} className="w-7 h-7">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-                </svg>
-              </button>
-              <button
-                onClick={() => {
-                  const next = !saved
-                  setSaved(next)
-                  fetch(`/api/experiences/${exp.id}/bookmark`, { method: next ? 'POST' : 'DELETE' })
-                }}
-                className="active:scale-90 transition-transform"
-              >
-                <svg viewBox="0 0 24 24" fill={saved ? 'white' : 'none'} stroke="white" strokeWidth={1.5} className="w-7 h-7">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
-                </svg>
-              </button>
-            </div>
-            {likedByText && <p className="text-white text-sm font-semibold mb-1">{likedByText}</p>}
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-white font-black text-sm">{exp.restaurants?.name ?? 'Restaurant'}</span>
-              <span className="text-white/30">·</span>
-              <span className="flex gap-0.5">
-                {Array.from({ length: exp.rating }).map((_, i) => (
-                  <span key={i} className="text-xs" style={{ color: '#C9AA71' }}>★</span>
-                ))}
-              </span>
-            </div>
-            {exp.note && <p className="text-white/70 text-sm mb-2 leading-snug">&ldquo;{exp.note}&rdquo;</p>}
-            <p className="text-white/30 text-xs">{date}</p>
+          {likedByText && <p className="text-white text-sm font-semibold mb-1">{likedByText}</p>}
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-white font-black text-sm">{exp.restaurants?.name ?? 'Restaurant'}</span>
+            <span className="text-white/30">·</span>
+            <span className="flex gap-0.5">
+              {Array.from({ length: exp.rating }).map((_, i) => (
+                <span key={i} className="text-xs" style={{ color: '#C9AA71' }}>★</span>
+              ))}
+            </span>
           </div>
+          {exp.note && <p className="text-white/70 text-sm mb-2 leading-snug">&ldquo;{exp.note}&rdquo;</p>}
+          <p className="text-white/30 text-xs">{date}</p>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 
 // ── Feed bottom sheet ─────────────────────────────────────────────────────────
 
-function FeedSheet({ item, onClose }: { item: ContentItem; onClose: () => void }) {
+function FeedSheetContent({ item, onClose }: { item: ContentItem; onClose: () => void }) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [liked, setLiked] = useState(false)
   const [likeCount, setLikeCount] = useState(item.likes_count ?? 0)
@@ -657,70 +662,67 @@ function FeedSheet({ item, onClose }: { item: ContentItem; onClose: () => void }
     : likeCount > 0 ? `${likeCount} j'aime` : null
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-neutral-950 rounded-t-3xl overflow-hidden max-h-[92dvh] flex flex-col">
-        <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
-          <div className="w-10 h-1 rounded-full bg-white/20" />
+    <>
+      <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
+        <div className="w-10 h-1 rounded-full bg-white/20" />
+      </div>
+      <div className="flex items-center gap-3 px-4 py-3 flex-shrink-0">
+        <div className="w-10 h-10 rounded-xl bg-cover bg-center flex-shrink-0" style={{ backgroundImage: `url(https://picsum.photos/seed/${seed}food/80/80)` }} />
+        <div className="flex-1 min-w-0">
+          <p className="text-white font-bold text-sm truncate">{item.restaurants?.name ?? 'Restaurant'}</p>
+          <p className="text-white/40 text-xs">Vidéo du restaurant</p>
         </div>
-        <div className="flex items-center gap-3 px-4 py-3 flex-shrink-0">
-          <div className="w-10 h-10 rounded-xl bg-cover bg-center flex-shrink-0" style={{ backgroundImage: `url(https://picsum.photos/seed/${seed}food/80/80)` }} />
-          <div className="flex-1 min-w-0">
-            <p className="text-white font-bold text-sm truncate">{item.restaurants?.name ?? 'Restaurant'}</p>
-            <p className="text-white/40 text-xs">Vidéo du restaurant</p>
+        <button onClick={onClose} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={2} className="w-4 h-4">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div className="relative bg-black overflow-hidden flex-shrink-0" style={{ aspectRatio: '9/16', maxHeight: '60dvh' }}>
+        {item.content_url ? (
+          <video ref={videoRef} src={item.content_url} className="w-full h-full object-cover" loop muted playsInline />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <span className="text-6xl opacity-10">🎬</span>
           </div>
-          <button onClick={onClose} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={2} className="w-4 h-4">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+        )}
+      </div>
+      <div className="px-4 py-3 flex-shrink-0">
+        <div className="flex items-center gap-4 mb-2">
+          <button
+            onClick={() => {
+              const next = !liked
+              setLiked(next)
+              setLikeCount(c => next ? c + 1 : c - 1)
+              fetch(`/api/feed/posts/${item.id}/like`, { method: next ? 'POST' : 'DELETE' })
+            }}
+            className="active:scale-90 transition-transform"
+          >
+            <svg viewBox="0 0 24 24" fill={liked ? '#E4002B' : 'none'} stroke={liked ? '#E4002B' : 'white'} strokeWidth={1.5} className="w-7 h-7">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+            </svg>
+          </button>
+          <button
+            onClick={() => {
+              const next = !saved
+              setSaved(next)
+              fetch(`/api/feed/posts/${item.id}/bookmark`, { method: next ? 'POST' : 'DELETE' })
+            }}
+            className="active:scale-90 transition-transform"
+          >
+            <svg viewBox="0 0 24 24" fill={saved ? 'white' : 'none'} stroke="white" strokeWidth={1.5} className="w-7 h-7">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
             </svg>
           </button>
         </div>
-        <div className="relative bg-black overflow-hidden flex-shrink-0" style={{ aspectRatio: '9/16', maxHeight: '60dvh' }}>
-          {item.content_url ? (
-            <video ref={videoRef} src={item.content_url} className="w-full h-full object-cover" loop muted playsInline />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <span className="text-6xl opacity-10">🎬</span>
-            </div>
-          )}
-        </div>
-        <div className="px-4 py-3 flex-shrink-0">
-          <div className="flex items-center gap-4 mb-2">
-            <button
-              onClick={() => {
-                const next = !liked
-                setLiked(next)
-                setLikeCount(c => next ? c + 1 : c - 1)
-                fetch(`/api/feed/posts/${item.id}/like`, { method: next ? 'POST' : 'DELETE' })
-              }}
-              className="active:scale-90 transition-transform"
-            >
-              <svg viewBox="0 0 24 24" fill={liked ? '#E4002B' : 'none'} stroke={liked ? '#E4002B' : 'white'} strokeWidth={1.5} className="w-7 h-7">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-              </svg>
-            </button>
-            <button
-              onClick={() => {
-                const next = !saved
-                setSaved(next)
-                fetch(`/api/feed/posts/${item.id}/bookmark`, { method: next ? 'POST' : 'DELETE' })
-              }}
-              className="active:scale-90 transition-transform"
-            >
-              <svg viewBox="0 0 24 24" fill={saved ? 'white' : 'none'} stroke="white" strokeWidth={1.5} className="w-7 h-7">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
-              </svg>
-            </button>
-          </div>
-          {likedByText && <p className="text-white text-sm font-semibold mb-1">{likedByText}</p>}
-          <p className="text-white font-black text-sm mb-0.5">{item.restaurants?.name ?? 'Restaurant'}</p>
-          {item.restaurants?.description && (
-            <p className="text-white/60 text-xs leading-snug mb-1.5 line-clamp-2">{item.restaurants.description}</p>
-          )}
-          {date && <p className="text-white/30 text-xs">{date}</p>}
-        </div>
+        {likedByText && <p className="text-white text-sm font-semibold mb-1">{likedByText}</p>}
+        <p className="text-white font-black text-sm mb-0.5">{item.restaurants?.name ?? 'Restaurant'}</p>
+        {item.restaurants?.description && (
+          <p className="text-white/60 text-xs leading-snug mb-1.5 line-clamp-2">{item.restaurants.description}</p>
+        )}
+        {date && <p className="text-white/30 text-xs">{date}</p>}
       </div>
-    </div>
+    </>
   )
 }
 
