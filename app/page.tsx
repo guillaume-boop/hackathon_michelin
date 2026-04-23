@@ -41,8 +41,9 @@ export default function FeedPage() {
     if (fetchedIndicesRef.current.has(idx)) return
     if (isFetchingRef.current && !pendingAbortControllersRef.current.has(idx)) return // Skip if another is fetching (unless this is a preload)
 
+    setLoadingMore(true)
     isFetchingRef.current = true
-    
+
     // Create an AbortController for this fetch
     const abortController = new AbortController()
     pendingAbortControllersRef.current.set(idx, abortController)
