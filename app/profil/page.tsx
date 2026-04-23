@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import UserProfileView from '@/components/profile/UserProfileView'
 import AuthGateModal from '@/components/ui/AuthGateModal'
@@ -9,6 +9,15 @@ import BottomNav from '@/components/layout/BottomNav'
 export default function ProfilPage() {
   const { data: session, status } = useSession()
   const [showAuthGate, setShowAuthGate] = useState(false)
+  const [variant, setVariant] = useState<'dark' | 'light'>('dark')
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-color-scheme: light)')
+    setVariant(mq.matches ? 'light' : 'dark')
+    const handler = (e: MediaQueryListEvent) => setVariant(e.matches ? 'light' : 'dark')
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
 
   if (status === 'loading') {
     return (
@@ -39,5 +48,5 @@ export default function ProfilPage() {
     )
   }
 
-  return <UserProfileView userId={session.user.id} isSelf />
+  return <UserProfileView userId={session.user.id} isSelf variant={variant} />
 }

@@ -147,14 +147,15 @@ export default function UserProfileView({ userId, isSelf, showBackButton = false
   })()
 
   return (
-    <div className="flex flex-col bg-black min-h-dvh pb-28">
+    <div className={`flex flex-col min-h-dvh pb-28 ${isLight ? 'bg-white' : 'bg-black'}`}>
 
       {/* ── Top bar ──────────────────────────────────────────── */}
       <div className="flex items-center justify-between px-4 pt-14 pb-4">
         {showBackButton ? (
           <button
             onClick={() => router.back()}
-            className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center"
+            className="w-9 h-9 rounded-full flex items-center justify-center"
+            style={{ background: '#E4002B' }}
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={2} className="w-5 h-5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -260,11 +261,11 @@ export default function UserProfileView({ userId, isSelf, showBackButton = false
         <>
           {chefData.restaurants && (
             <div className="mb-5">
-              <p className="text-white font-bold text-sm px-4 mb-2">Retrouvez moi au</p>
+              <p className={`font-bold text-sm px-4 mb-2 ${isLight ? 'text-[#262626]' : 'text-white'}`}>Retrouvez moi au</p>
               <Link
                 href={`/restaurant/${chefData.restaurants.id}`}
                 className="flex items-center gap-3 w-full px-4 py-1.5 transition-colors"
-                style={{ background: '#2D2D2D' }}
+                style={{ background: isLight ? '#F2F2F2' : '#2D2D2D' }}
               >
                 <div
                   className="w-12 h-12 rounded-full bg-cover bg-center flex-shrink-0"
@@ -272,7 +273,7 @@ export default function UserProfileView({ userId, isSelf, showBackButton = false
                 />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5 min-w-0">
-                    <p className="text-white font-black text-sm truncate">{chefData.restaurants.name}</p>
+                    <p className={`font-black text-sm truncate ${isLight ? 'text-[#262626]' : 'text-white'}`}>{chefData.restaurants.name}</p>
                     {chefData.restaurants.michelin_stars > 0 && (
                       <Stars count={chefData.restaurants.michelin_stars} green={chefData.restaurants.green_stars} size="xs" />
                     )}
@@ -288,22 +289,22 @@ export default function UserProfileView({ userId, isSelf, showBackButton = false
 
           {chefData.bio && (
             <div className="px-4 mb-5">
-              <p className="text-white font-bold text-sm mb-2">Mon histoire</p>
-              <p style={{ color: '#B1B1B1' }} className="text-xs font-normal leading-relaxed">{chefData.bio}</p>
+              <p className={`font-bold text-sm mb-2 ${isLight ? 'text-[#262626]' : 'text-white'}`}>Mon histoire</p>
+              <p style={{ color: isLight ? '#262626' : '#B1B1B1' }} className="text-xs font-normal leading-relaxed">{chefData.bio}</p>
             </div>
           )}
 
           {dishes.length > 0 && (
             <div className="mb-5">
-              <p className="text-white font-bold text-sm px-4 mb-3">Mes plats signatures</p>
+              <p className={`font-bold text-sm px-4 mb-3 ${isLight ? 'text-[#262626]' : 'text-white'}`}>Mes plats signatures</p>
               <div className="flex gap-3 overflow-x-auto px-4 pb-2 scrollbar-hide">
                 {dishes.map(dish => {
                   const img = dish.photo_url ?? `https://picsum.photos/seed/${dish.name.replace(/\s/g, '').toLowerCase()}/300/300`
                   return (
-                    <div key={dish.id} className="flex-shrink-0 w-40 rounded-2xl overflow-hidden bg-neutral-900 border border-white/5">
+                    <div key={dish.id} className={`flex-shrink-0 w-40 rounded-2xl overflow-hidden border ${isLight ? 'bg-neutral-100 border-black/5' : 'bg-neutral-900 border-white/5'}`}>
                       <div className="w-full h-28 bg-cover bg-center" style={{ backgroundImage: `url(${img})` }} />
                       <div className="p-3">
-                        <p className="text-white font-medium text-xs text-center leading-tight">{dish.name}</p>
+                        <p className={`font-medium text-xs text-center leading-tight ${isLight ? 'text-[#262626]' : 'text-white'}`}>{dish.name}</p>
                       </div>
                     </div>
                   )
@@ -315,7 +316,7 @@ export default function UserProfileView({ userId, isSelf, showBackButton = false
       )}
 
       {/* ── Tab bar ──────────────────────────────────────────── */}
-      <div className="flex border-t border-b border-white/[0.08]">
+      <div className={`flex border-t border-b ${isLight ? 'border-black/[0.08]' : 'border-white/[0.08]'}`}>
         {([
           {
             key: 'posts' as Tab,

@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useState, useEffect } from 'react'
 
 const tabs = [
   {
@@ -52,23 +53,46 @@ const tabs = [
   },
 ]
 
-export default function BottomNav() {
+export default function BottomNav({ forceDark = false }: { forceDark?: boolean }) {
   const pathname = usePathname()
+  const [systemLight, setSystemLight] = useState(false)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-color-scheme: light)')
+    setSystemLight(mq.matches)
+    const handler = (e: MediaQueryListEvent) => setSystemLight(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
+
+  const isLight = systemLight && !forceDark
 
   return (
     <nav className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-sm">
-      <div className="flex items-center justify-around bg-neutral-900/95 backdrop-blur-xl rounded-full px-2 py-2 border border-white/[0.06] shadow-2xl">
+      <div
+        className="flex items-center justify-around backdrop-blur-xl rounded-full px-2 py-2 shadow-2xl"
+        style={{
+          background: isLight ? 'rgba(220,220,220,0.95)' : 'rgba(23,23,23,0.95)',
+          border: isLight ? '1px solid rgba(0,0,0,0.06)' : '1px solid rgba(255,255,255,0.06)',
+        }}
+      >
         {tabs.map(({ href, icon }) => {
-          const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href)
+          const isProfilePage = pathname.startsWith('/user') || pathname.startsWith('/chef')
+          const isActive = href === '/'
+            ? pathname === '/'
+            : href === '/decouvrir'
+              ? pathname.startsWith('/decouvrir') || isProfilePage
+              : pathname.startsWith(href)
           return (
             <Link
               key={href}
               href={href}
+              onClick={() => { if (href !== '/decouvrir') sessionStorage.removeItem('decouvrir_query') }}
               className="flex items-center justify-center"
             >
               <span
                 className="flex items-center justify-center w-10 h-10 rounded-full transition-all duration-200"
-                style={isActive ? { background: '#E4002B' } : { color: 'rgba(255,255,255,0.35)' }}
+                style={isActive ? { background: '#E4002B' } : { color: isLight ? 'rgba(0,0,0,0.45)' : 'rgba(255,255,255,0.35)' }}
               >
                 {icon(isActive)}
               </span>

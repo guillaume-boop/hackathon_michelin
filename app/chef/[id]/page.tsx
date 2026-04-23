@@ -11,6 +11,15 @@ export default function ChefPage() {
   const { data: session } = useSession()
   const [userId, setUserId] = useState<string | null>(null)
   const [notFound, setNotFound] = useState(false)
+  const [variant, setVariant] = useState<'dark' | 'light'>('dark')
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-color-scheme: light)')
+    setVariant(mq.matches ? 'light' : 'dark')
+    const handler = (e: MediaQueryListEvent) => setVariant(e.matches ? 'light' : 'dark')
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
 
   useEffect(() => {
     if (!id) return
@@ -40,5 +49,5 @@ export default function ChefPage() {
 
   const isSelf = session?.user?.id === userId
 
-  return <UserProfileView userId={userId} isSelf={isSelf} showBackButton />
+  return <UserProfileView userId={userId} isSelf={isSelf} showBackButton variant={variant} />
 }

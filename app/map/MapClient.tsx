@@ -24,9 +24,10 @@ function markerColor(stars: number, green: boolean) {
   return '#facc15'
 }
 
-export default function MapClient() {
+export default function MapClient({ restaurantId }: { restaurantId?: string }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<L.Map | null>(null)
+  const restaurantIdRef = useRef(restaurantId)
 
   useEffect(() => {
     if (mapRef.current || !containerRef.current) return
@@ -86,7 +87,8 @@ export default function MapClient() {
             ? `<span style="background:#4ade80;color:#000;font-size:9px;font-weight:700;padding:1px 6px;border-radius:999px;margin-left:4px;">🌿</span>`
             : ''
 
-          const marker = L.marker([r.lat, r.lng], { icon }).bindPopup(`
+          const marker = L.marker([r.lat, r.lng], { icon })
+          marker.bindPopup(`
             <div style="font-family:sans-serif;min-width:160px">
               <div style="font-weight:900;font-size:13px;line-height:1.3;margin-bottom:2px">${r.name}</div>
               <div style="font-size:11px;color:#888;margin-bottom:6px">${r.city}</div>
@@ -102,6 +104,13 @@ export default function MapClient() {
           `)
 
           cluster.addLayer(marker)
+
+          if (restaurantIdRef.current && r.id === restaurantIdRef.current) {
+            setTimeout(() => {
+              currentMap.setView([r.lat, r.lng], 15)
+              marker.openPopup()
+            }, 300)
+          }
         })
 
         if (mapRef.current) currentMap.addLayer(cluster)
