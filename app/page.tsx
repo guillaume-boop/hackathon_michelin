@@ -171,257 +171,207 @@ export default function FeedPage() {
         </div>
       </aside>
 
-      {/* ─── MAIN FEED ─── */}
-      <main className="flex-1 flex flex-col min-w-0 h-full">
-        
-        {/* Mobile Header */}
-        <div className="lg:hidden fixed top-0 left-0 right-0 z-30 px-4 py-3 bg-gradient-to-b from-white/80 to-transparent dark:from-black/80 backdrop-blur-sm">
-          <div className="flex items-center justify-between">
-            <span className="font-black text-lg text-gray-900 dark:text-white">MICHELIN</span>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setShowFilterPanel(!showFilterPanel)}
-                className="p-2.5 rounded-full bg-black/10 dark:bg-white/20 backdrop-blur-sm hover:bg-black/20 dark:hover:bg-white/30 transition-all"
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 text-gray-900 dark:text-white">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
-                </svg>
-              </button>
-              <Link
-                href="/decouvrir"
-                className="p-2.5 rounded-full bg-black/10 dark:bg-white/20 backdrop-blur-sm hover:bg-black/20 dark:hover:bg-white/30 transition-all"
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 text-gray-900 dark:text-white">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                </svg>
-              </Link>
-              <button
-                onClick={() => setMuted(m => !m)}
-                className="p-2.5 rounded-full bg-black/10 dark:bg-white/20 backdrop-blur-sm hover:bg-black/20 dark:hover:bg-white/30 transition-all"
-              >
-                {muted ? (
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 text-gray-900 dark:text-white">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6 4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
-                  </svg>
-                ) : (
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 text-gray-900 dark:text-white">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
-                  </svg>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
+  {/* ─── MAIN FEED ─── */}
+<main className="flex-1 flex flex-col min-w-0 h-full">
+  
+  {/* Mobile Header */}
+  <div className="lg:hidden fixed top-0 left-0 right-0 z-30 px-4 py-3  ">
+    <div className="flex items-center justify-between">
+      <span className="font-black text-lg text-white dark:text-white"></span>
+      <div className="flex gap-2 py-8">
+        <button
+          onClick={() => setShowFilterPanel(!showFilterPanel)}
+          className="p-2.5 rounded-full text-white  bg-white/10 backdrop-blur-sm hover:bg-black/20 dark:hover:bg-white/30 transition-all"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 text-white dark:text-white">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+          </svg>
+        </button>
+        <Link
+          href="/decouvrir"
+          className="p-2.5 rounded-full bg-white/10 backdrop-blur-sm hover:bg-black/20 dark:hover:bg-white/30 transition-all"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 text-white dark:text-white">
+            <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+          </svg>
+        </Link>
+        <button
+          onClick={() => setMuted(m => !m)}
+          className="p-2.5 rounded-full bg-white/10 backdrop-blur-sm hover:bg-black/20 dark:hover:bg-white/30 transition-all"
+        >
+          {muted ? (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 text-white dark:text-white">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6 4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
+            </svg>
+          ) : (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 text-white dark:text-white">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
+            </svg>
+          )}
+        </button>
+      </div>
+    </div>
+  </div>
 
-        {/* Filter Panel Mobile */}
-        {showFilterPanel && (
-          <div className="lg:hidden fixed inset-0 z-50 bg-black/50 dark:bg-black/80 flex items-end" onClick={() => setShowFilterPanel(false)}>
-            <div className="bg-white dark:bg-gray-900 rounded-t-2xl w-full p-4 max-h-[70vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-              <div className="w-12 h-1 bg-gray-300 dark:bg-gray-700 rounded-full mx-auto mb-4" />
-              <h3 className="font-bold text-lg mb-3 text-gray-900 dark:text-white">Filtrer par</h3>
-              <div className="space-y-2">
-                {[
-                  { val: null, label: 'Tous' },
-                  { val: 1, label: '★ 1 étoile' },
-                  { val: 2, label: '★★ 2 étoiles' },
-                  { val: 3, label: '★★★ 3 étoiles' },
-                  { val: -1, label: '🌿 Green Star' },
-                ].map(f => (
-                  <button
-                    key={String(f.val)}
-                    onClick={() => { setFilter(f.val); setShowFilterPanel(false) }}
-                    className={`w-full text-left px-4 py-3 rounded-lg font-semibold transition-colors ${
-                      filter === f.val
-                        ? 'bg-[#E4002B]/20 text-[#E4002B] dark:bg-[#E4002B]/30'
-                        : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
-                    }`}
-                  >
-                    {f.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Desktop Header */}
-        <div className="hidden lg:flex items-center justify-between px-4 xl:px-6 2xl:px-8 py-3 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-20 bg-white/50 dark:bg-black/50 backdrop-blur-md">
-          {/* Search Bar */}
-          <div className="flex-1 max-w-md xl:max-w-lg 2xl:max-w-2xl">
-            <div className="relative">
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-              </svg>
-              <input
-                type="text"
-                placeholder="Chercher..."
-                className="w-full pl-10 pr-4 py-2.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#E4002B] focus:bg-white dark:focus:bg-gray-800 transition-all placeholder:text-gray-500 dark:placeholder:text-gray-500"
-              />
-            </div>
-          </div>
-
-          {/* Controls Right */}
-          <div className="flex items-center gap-3 ml-4 xl:ml-6">
-            {/* Grid/Single Toggle (2xl) */}
-            <div className="hidden 2xl:flex items-center bg-gray-100 dark:bg-gray-900 rounded-lg p-1">
-              <button
-                onClick={() => setViewMode('single')}
-                className={`px-3 py-1.5 rounded-md transition-all ${
-                  viewMode === 'single'
-                    ? 'bg-white dark:bg-gray-700 text-[#E4002B] font-semibold'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-                }`}
-                title="Vue simple"
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4">
-                  <rect x="3" y="3" width="18" height="18" rx="2" />
-                </svg>
-              </button>
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`px-3 py-1.5 rounded-md transition-all ${
-                  viewMode === 'grid'
-                    ? 'bg-white dark:bg-gray-700 text-[#E4002B] font-semibold'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-                }`}
-                title="Vue grille"
-              >
-                <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                  <rect x="3" y="3" width="7" height="7" />
-                  <rect x="14" y="3" width="7" height="7" />
-                  <rect x="14" y="14" width="7" height="7" />
-                  <rect x="3" y="14" width="7" height="7" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Sound */}
+  {/* Filter Panel Mobile */}
+  {showFilterPanel && (
+    <div className="lg:hidden fixed inset-0 z-50 bg-black/50 dark:bg-black/80 flex items-end" onClick={() => setShowFilterPanel(false)}>
+      <div className="bg-white dark:bg-gray-900 rounded-t-2xl w-full p-4 max-h-[70vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+        <div className="w-12 h-1 bg-gray-300 dark:bg-gray-700 rounded-full mx-auto mb-4" />
+        <h3 className="font-bold text-lg mb-3 text-gray-900 dark:text-white">Filtrer par</h3>
+        <div className="space-y-2">
+          {[
+            { val: null, label: 'Tous' },
+            { val: 1, label: '★ 1 étoile' },
+            { val: 2, label: '★★ 2 étoiles' },
+            { val: 3, label: '★★★ 3 étoiles' },
+            { val: -1, label: '🌿 Green Star' },
+          ].map(f => (
             <button
-              onClick={() => setMuted(m => !m)}
-              className="p-2 rounded-lg bg-gray-100 dark:bg-gray-900 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors"
+              key={String(f.val)}
+              onClick={() => { setFilter(f.val); setShowFilterPanel(false) }}
+              className={`w-full text-left px-4 py-3 rounded-lg font-semibold transition-colors ${
+                filter === f.val
+                  ? 'bg-[#E4002B]/20 text-[#E4002B] dark:bg-[#E4002B]/30'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+              }`}
             >
-              {muted ? (
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-5 h-5 text-gray-700 dark:text-gray-300">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6 4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
-                </svg>
-              ) : (
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-5 h-5 text-gray-700 dark:text-gray-300">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
-                </svg>
-              )}
+              {f.label}
             </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  )}
 
-            {/* Profile Summary Desktop */}
-            {session ? (
-              <div className="flex items-center gap-2">
-                <Link
-                  href="/profil"
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-900 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors"
-                >
-                  <div className="w-6 h-6 rounded-full overflow-hidden bg-gray-300 dark:bg-gray-700">
-                    {session.user?.image ? (
-                      <Image src={session.user.image} alt="Avatar" width={24} height={24} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-xs font-bold text-gray-600 dark:text-gray-400">
-                        {session.user?.email?.[0]?.toUpperCase()}
-                      </div>
-                    )}
-                  </div>
-                  <span className="text-sm font-semibold hidden xl:block text-gray-700 dark:text-gray-300">{session.user?.name?.split(' ')[0] || 'Profil'}</span>
-                </Link>
+  {/* Desktop Header */}
+  <div className="hidden lg:flex items-center justify-between px-4 xl:px-6 2xl:px-8 py-3 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-20 bg-white/50 dark:bg-black/50 backdrop-blur-md">
+    {/* Search Bar */}
+    <div className="flex-1 max-w-md xl:max-w-lg 2xl:max-w-2xl">
+      <div className="relative">
+        <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+        </svg>
+        <input
+          type="text"
+          placeholder="Chercher..."
+          className="w-full pl-10 pr-4 py-2.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#E4002B] focus:bg-white dark:focus:bg-gray-800 transition-all placeholder:text-gray-500 dark:placeholder:text-gray-500"
+        />
+      </div>
+    </div>
+
+    {/* Controls Right */}
+    <div className="flex items-center gap-3 ml-4 xl:ml-6">
+      {/* Grid/Single Toggle (2xl) */}
+      <div className="hidden 2xl:flex items-center bg-gray-100 dark:bg-gray-900 rounded-lg p-1">
+        <button
+          onClick={() => setViewMode('single')}
+          className={`px-3 py-1.5 rounded-md transition-all ${
+            viewMode === 'single'
+              ? 'bg-white dark:bg-gray-700 text-[#E4002B] font-semibold'
+              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+          }`}
+          title="Vue simple"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4">
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+          </svg>
+        </button>
+        <button
+          onClick={() => setViewMode('grid')}
+          className={`px-3 py-1.5 rounded-md transition-all ${
+            viewMode === 'grid'
+              ? 'bg-white dark:bg-gray-700 text-[#E4002B] font-semibold'
+              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+          }`}
+          title="Vue grille"
+        >
+          <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+            <rect x="3" y="3" width="7" height="7" />
+            <rect x="14" y="3" width="7" height="7" />
+            <rect x="14" y="14" width="7" height="7" />
+            <rect x="3" y="14" width="7" height="7" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Sound */}
+      <button
+        onClick={() => setMuted(m => !m)}
+        className="p-2 rounded-lg bg-gray-100 dark:bg-gray-900 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors"
+      >
+        {muted ? (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-5 h-5 text-gray-700 dark:text-gray-300">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6 4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
+          </svg>
+        ) : (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-5 h-5 text-gray-700 dark:text-gray-300">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
+          </svg>
+        )}
+      </button>
+
+      {/* Profile Summary Desktop */}
+      {session ? (
+        <div className="flex items-center gap-2">
+          <Link
+            href="/profil"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-900 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors"
+          >
+            <div className="w-6 h-6 rounded-full overflow-hidden bg-gray-300 dark:bg-gray-700">
+              {session.user?.image ? (
+                <Image src={session.user.image} alt="Avatar" width={24} height={24} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-xs font-bold text-gray-600 dark:text-gray-400">
+                  {session.user?.email?.[0]?.toUpperCase()}
+                </div>
+              )}
+            </div>
+            <span className="text-sm font-semibold hidden xl:block text-gray-700 dark:text-gray-300">{session.user?.name?.split(' ')[0] || 'Profil'}</span>
+          </Link>
+        </div>
+      ) : (
+        <Link
+          href="/login"
+          className="px-4 py-2 rounded-lg text-sm font-bold text-white bg-[#E4002B] hover:opacity-90 transition-opacity"
+        >
+          Connexion
+        </Link>
+      )}
+    </div>
+  </div>
+
+  {/* Feed Content - Reduced width on desktop */}
+  <div className="flex-1 flex items-center justify-center relative overflow-hidden lg:pt-0">
+    {viewMode === 'single' ? (
+      <>
+        {/* Single View - Centered with reduced width on desktop */}
+        <div
+          ref={containerRef}
+          className="relative bg-white dark:bg-black overflow-hidden h-full w-full flex justify-center"
+          style={{ height: '100dvh' }}
+        >
+          {/* Container with max-width for desktop */}
+          <div className="relative w-full lg:max-w-[380px] xl:max-w-[420px] 2xl:max-w-[480px] h-full">
+            {loading ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="w-10 h-10 border-2 border-gray-300 dark:border-white/20 border-t-gray-900 dark:border-t-white rounded-full animate-spin" />
+              </div>
+            ) : filteredPosts.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full gap-4 text-center">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1} className="w-16 h-16 text-gray-400 dark:text-white/30">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.182 16.318A4.486 4.486 0 0 0 12.016 15a4.486 4.486 0 0 0-3.198 1.318M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Z" />
+                </svg>
+                <p className="text-gray-500 dark:text-white/60">Aucun contenu</p>
               </div>
             ) : (
-              <Link
-                href="/login"
-                className="px-4 py-2 rounded-lg text-sm font-bold text-white bg-[#E4002B] hover:opacity-90 transition-opacity"
-              >
-                Connexion
-              </Link>
-            )}
-          </div>
-        </div>
-
-        {/* Feed Content - Reduced width on desktop */}
-        <div className="flex-1 flex items-center justify-center relative overflow-hidden pt-16 lg:pt-0">
-          {viewMode === 'single' ? (
-            <>
-              {/* Single View - Centered with reduced width on desktop */}
-              <div
-                ref={containerRef}
-                className="relative bg-white dark:bg-black overflow-hidden h-full w-full flex justify-center"
-                style={{ height: '100dvh' }}
-              >
-                {/* Container with max-width for desktop */}
-                <div className="relative w-full lg:max-w-[380px] xl:max-w-[420px] 2xl:max-w-[480px] h-full">
-                  {loading ? (
-                    <div className="flex items-center justify-center h-full">
-                      <div className="w-10 h-10 border-2 border-gray-300 dark:border-white/20 border-t-gray-900 dark:border-t-white rounded-full animate-spin" />
-                    </div>
-                  ) : filteredPosts.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center h-full gap-4 text-center">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1} className="w-16 h-16 text-gray-400 dark:text-white/30">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.182 16.318A4.486 4.486 0 0 0 12.016 15a4.486 4.486 0 0 0-3.198 1.318M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Z" />
-                      </svg>
-                      <p className="text-gray-500 dark:text-white/60">Aucun contenu</p>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="relative w-full h-full overflow-y-scroll snap-y snap-mandatory" style={{ scrollbarWidth: 'none' }}>
-                        {filteredPosts.map((post, i) => (
-                          <div key={post.id} className="feed-item" data-index={i}>
-                            <VideoCard
-                              post={post}
-                              isActive={i === activeIndex}
-                              muted={muted}
-                              onAuthRequired={() => setShowAuthGate(true)}
-                              sessionUserId={session?.user?.id}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                      
-                      {/* Pagination Dots */}
-                      {filteredPosts.length > 1 && (
-                        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col gap-1.5 z-10 pointer-events-none">
-                          {filteredPosts.slice(Math.max(0, activeIndex - 3), activeIndex + 4).map((_, idx) => {
-                            const realIdx = Math.max(0, activeIndex - 3) + idx
-                            return (
-                              <div
-                                key={realIdx}
-                                className={`rounded-full transition-all duration-300 ${
-                                  realIdx === activeIndex ? 'w-1.5 h-4 bg-gray-900 dark:bg-white' : 'w-1.5 h-1.5 bg-gray-400 dark:bg-white/30'
-                                }`}
-                              />
-                            )
-                          })}
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
-              </div>
-            </>
-          ) : (
-            /* Grid View (2xl+) */
-            <div className="w-full h-full overflow-y-auto p-4 xl:p-6 2xl:p-8 bg-white dark:bg-black">
-              {loading ? (
-                <div className="flex items-center justify-center h-full">
-                  <div className="w-10 h-10 border-2 border-gray-300 dark:border-white/20 border-t-gray-900 dark:border-t-white rounded-full animate-spin" />
-                </div>
-              ) : filteredPosts.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full gap-4 text-center">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1} className="w-16 h-16 text-gray-400 dark:text-white/30">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.182 16.318A4.486 4.486 0 0 0 12.016 15a4.486 4.486 0 0 0-3.198 1.318M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Z" />
-                  </svg>
-                  <p className="text-gray-500 dark:text-white/60">Aucun contenu</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 xl:gap-6 auto-rows-max max-w-[1600px] mx-auto">
+              <>
+                <div className="relative w-full h-full overflow-y-scroll snap-y snap-mandatory" style={{ scrollbarWidth: 'none' }}>
                   {filteredPosts.map((post, i) => (
-                    <div key={post.id} className="h-[500px] xl:h-[600px] 2xl:h-[650px] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow">
+                    <div key={post.id} className="feed-item" data-index={i}>
                       <VideoCard
                         post={post}
-                        isActive={true}
+                        isActive={i === activeIndex}
                         muted={muted}
                         onAuthRequired={() => setShowAuthGate(true)}
                         sessionUserId={session?.user?.id}
@@ -429,11 +379,61 @@ export default function FeedPage() {
                     </div>
                   ))}
                 </div>
-              )}
-            </div>
-          )}
+                
+                {/* Pagination Dots */}
+                {filteredPosts.length > 1 && (
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col gap-1.5 z-10 pointer-events-none">
+                    {filteredPosts.slice(Math.max(0, activeIndex - 3), activeIndex + 4).map((_, idx) => {
+                      const realIdx = Math.max(0, activeIndex - 3) + idx
+                      return (
+                        <div
+                          key={realIdx}
+                          className={`rounded-full transition-all duration-300 ${
+                            realIdx === activeIndex ? 'w-1.5 h-4 bg-gray-900 dark:bg-white' : 'w-1.5 h-1.5 bg-gray-400 dark:bg-white/30'
+                          }`}
+                        />
+                      )
+                    })}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
         </div>
-      </main>
+      </>
+    ) : (
+      /* Grid View (2xl+) */
+      <div className="w-full h-full overflow-y-auto p-4 xl:p-6 2xl:p-8 bg-white dark:bg-black">
+        {loading ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="w-10 h-10 border-2 border-gray-300 dark:border-white/20 border-t-gray-900 dark:border-t-white rounded-full animate-spin" />
+          </div>
+        ) : filteredPosts.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full gap-4 text-center">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1} className="w-16 h-16 text-gray-400 dark:text-white/30">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.182 16.318A4.486 4.486 0 0 0 12.016 15a4.486 4.486 0 0 0-3.198 1.318M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Z" />
+            </svg>
+            <p className="text-gray-500 dark:text-white/60">Aucun contenu</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 xl:gap-6 auto-rows-max max-w-[1600px] mx-auto">
+            {filteredPosts.map((post, i) => (
+              <div key={post.id} className="h-[500px] xl:h-[600px] 2xl:h-[650px] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow">
+                <VideoCard
+                  post={post}
+                  isActive={true}
+                  muted={muted}
+                  onAuthRequired={() => setShowAuthGate(true)}
+                  sessionUserId={session?.user?.id}
+                />
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    )}
+  </div>
+</main>
 
       {/* ─── SIDEBAR DROITE (xl+) ─── */}
       <aside className="hidden xl:flex flex-col w-72 2xl:w-80 shrink-0 border-l border-gray-200 dark:border-gray-800 h-full overflow-y-auto bg-white dark:bg-black p-5">
