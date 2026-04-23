@@ -5,8 +5,8 @@ const MapClient = dynamic(() => import('./MapClient'), { ssr: false })
 
 export default function MapPage({ searchParams }: { searchParams: { restaurant?: string } }) {
   return (
-    <div className="relative bg-black" style={{ height: '100dvh' }}>
-      <div className="absolute inset-0 bottom-20">
+    <div className="relative bg-black overflow-hidden" style={{ height: '100dvh' }}>
+      <div className="absolute inset-0 bottom-20 overflow-hidden">
         <MapClient restaurantId={searchParams.restaurant} />
       </div>
       <BottomNav />
