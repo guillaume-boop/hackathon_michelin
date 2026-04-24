@@ -25,10 +25,11 @@ type Photo = {
 }
 
 function markerColor(stars: number, green: boolean) {
-  if (green && stars === 0) return '#4ade80'
-  if (stars >= 3) return '#E4002B'
-  if (stars === 2) return '#f97316'
-  return '#facc15'
+  if (green && stars === 0) return '#07D329'
+  if (stars === 3) return '#D3072C'
+  if (stars === 2) return '#D30792'
+  if (stars === 1) return '#D34807'
+  return '#FFFFFF'
 }
 
 export default function MapClient({ restaurantId }: { restaurantId?: string }) {
