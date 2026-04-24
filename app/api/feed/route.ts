@@ -31,19 +31,34 @@ export async function GET(request: Request) {
     }
   }
 
-  // If offset is not provided, use random ordering
   if (offset === undefined) {
-    query = query.order('random')
+    // Get total count for random offset
+    const { count } = await supabaseAdmin
+      .from('feed_posts')
+      .select('id', { count: 'exact', head: true })
+
+    const totalPosts = count ?? 0
+    const maxOffset = Math.max(0, totalPosts - (limit * 2))
+    const randomOffset = Math.floor(Math.random() * maxOffset)
+
+    query = query.range(randomOffset, randomOffset + (limit * 2) - 1)
   } else {
     query = query.order('created_at', { ascending: false }).range(offset, offset + limit - 1)
   }
 
-  if (offset === undefined) {
-    query = query.limit(limit)
-  }
-
-  const { data, error } = await query
+  const { data: initialData, error } = await query
   if (error) return apiError(ServerError(error.message))
+  let data = initialData
+
+  // Deduplicate restaurants: max 1 post per restaurant in results
+  if (offset === undefined && data) {
+    const seen = new Set<string>()
+    data = data.filter(p => {
+      if (seen.has(p.restaurant_id)) return false
+      seen.add(p.restaurant_id)
+      return true
+    }).slice(0, limit)
+  }
 
   if (!me || !data || data.length === 0) {
     return NextResponse.json(data)
