@@ -12,6 +12,9 @@ Notre solution transforme Michelin :
 
 ---
 
+
+
+
 ##  Positionnement : Mobile First
 
 Nous avons fait le choix du **mobile-first** car :
