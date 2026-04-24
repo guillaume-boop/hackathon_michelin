@@ -98,7 +98,7 @@ export default function FeedPage() {
   useEffect(() => {
     const fetchInitial = async () => {
       try {
-        const res = await fetch(`/api/feed?limit=20&offset=0`)
+        const res = await fetch(`/api/feed?limit=20&t=${Date.now()}`, { cache: 'no-store' })
         const data = await res.json()
         const newPosts = Array.isArray(data) ? data : []
         setPosts(newPosts)
