@@ -22,6 +22,8 @@ Nous avons fait le choix du **mobile-first** car :
 
 > Le desktop n’a pas été priorisé pour ce MVP, mais l’architecture permet une adaptation future.
 
+> 👉 [Accéder à l’application Michelin Swipe](https://hackathon-michelin.vercel.app/)
+
 ---
 
 ##  Fonctionnalités principales
