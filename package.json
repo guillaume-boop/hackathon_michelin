@@ -1,0 +1,45 @@
+{
+  "name": "hackathon_michelin",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "seed": "npx tsx scripts/seed.ts",
+    "seed:final": "npx tsx scripts/seed-final.ts",
+    "migrate:csv": "npx tsx scripts/migrate-csv-columns.ts",
+    "import:csv": "npx tsx scripts/import-csv.ts",
+    "upload:video": "npx tsx scripts/upload-video.ts",
+    "update:videos": "npx tsx scripts/update-feed-videos.ts"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.10.2",
+    "@supabase/supabase-js": "^2.104.0",
+    "@types/leaflet": "^1.9.21",
+    "bcryptjs": "^3.0.3",
+    "gsap": "^3.15.0",
+    "leaflet": "^1.9.4",
+    "leaflet.markercluster": "^1.5.3",
+    "next": "14.2.35",
+    "next-auth": "^4.24.14",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-leaflet": "^5.0.0",
+    "react-toastify": "^11.1.0",
+    "xrpl": "^4.6.0"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/leaflet.markercluster": "^1.5.6",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.35",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  }
+}
